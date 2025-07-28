@@ -1,0 +1,165 @@
+.order {
+    width: 100%;
+    height: 100%;
+}
+
+.order-contents {
+    display: flex;
+    justify-content: space-between;
+    margin: 5%;
+    
+    gap: 5%;
+}
+
+.left-contents {
+    width: 70%;
+    height: 100%;
+}
+
+.left-content {
+    width: 100%;
+    border-bottom: 1px solid #000000;
+    padding: 5%;
+}
+
+.left-content:first-child {
+    padding: 0 0 5% 0;
+}
+
+.item-info__area {
+    width: 60%;
+    display: flex;
+    justify-content: space-between;
+
+    gap: 10%;
+}
+
+.item-image {
+    width: 50%;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+}
+
+.item-info {
+    width: 50%;
+}
+.item-name {
+    font-size: 30px;
+    font-weight: 700;
+    font-style: bold;
+}
+
+.item-price {
+    font-size: 27px;
+}
+
+.price {
+    font-size: 32px;
+}
+
+.left-content__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.left-content__label {
+    display: block;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.select-wrapper {
+    position: relative;
+    width: 50%;
+    height: 45px;
+    margin: 2% 40% 0 8%;
+    color: #5F5F5F;
+    border: 1px solid #5F5F5F;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+}
+
+.select {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    appearance: none;
+    background-color: transparent;
+    color: #5F5F5F;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.select-wrapper::after {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #B1B1B1;
+    content: "";
+    transform: translateY(-50%);
+}
+
+.select option {
+    background-color: #636769;
+    color: #FFFFFF;
+}
+
+.btn-secondary {
+    font-size: 20px;
+    color: #0073CC;
+    text-decoration: none;
+}
+
+.address {
+    margin: 2% 8%;
+    font-size: 20px;
+    font-weight: semibold;
+}
+
+.right-contents {
+    width: 30%;
+}
+
+
+.confirm-content {
+    width: 100%;
+    padding: 2% 8%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #000000;
+}
+
+.confirm-content:last-child {
+    border-top: none;
+}
+
+.confirm-label {
+    display: block;
+    font-size: 20px;
+}
+
+.confirm-text {
+    display: block;
+    font-size: 24px;
+}
+
+.btn-primary {
+    margin-top: 40px;
+}
+
+

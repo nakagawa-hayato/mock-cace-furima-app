@@ -1,0 +1,198 @@
+.sell-form__form {
+    margin: 0 auto;
+    width: 40%;
+}
+
+@media screen and (max-width: 1200px) {
+    .sell-form__form {
+        width: 60%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .sell-form__form {
+        width: 90%;
+        padding: 48px 24px;
+    }
+}
+
+.sell-form__contents,
+.sell-form__content {
+    margin-top: 36px;
+}
+
+.sell-form__label {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.sell-form__image-contents {
+    width: 100%;
+    height: 160px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px dashed #5F5F5F;
+}
+
+
+/* input[type=file] を隠す */
+.sell-form__image input[type="file"] {
+    display: none;
+}
+
+/* プロフィール画像エリア */
+.sell-form__image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 登録済み画像のスタイル */
+.sell-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* アップロード用ボタン（label） */
+.sell-form__image-select {
+    display: inline-block;
+    width: auto;
+    padding: 10px 15px;
+    color: #FF5555;
+    border: 1px solid #FF5555;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color 0.3s;
+    background: #FFFFFF;
+}
+
+.sell-form__image-select:hover {
+    background-color: #ffecec;
+}
+
+.sell-form__labels {
+    display: block;
+    width: 100%;
+    margin-top: 60px;
+    font-weight: 700;
+    font-size: 30px;
+    color: #5F5F5F;
+    border-bottom: 1px solid #5F5F5F;
+}
+
+.sell-form__categories {
+    margin-top: 36px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px 10px;
+}
+.sell-form__category-item {
+    padding: 3px 18px;
+    color: #FF5555;
+    border: 1px solid #FF5555;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    background: #FFFFFF;
+    text-align: center;
+}
+
+.sell-form__category-item input[type="checkbox"] {
+    display: none;
+}
+
+.sell-form__category-item input[type="checkbox"]:checked+label {
+    background-color: #FF5555;
+    color: #FFFFFF;
+    border-color: #FF5555;
+}
+
+.sell-form__select {
+    position: relative;
+    width: 100%;
+    height: 45px;
+    margin-top: 12px;
+    color: #5F5F5F;
+    border: 1px solid #5F5F5F;
+    border-radius: 4px;
+    background-color: #FFFFFF;
+}
+
+.sell-form__select-condition {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 40px 0 12px;
+    font-size: 16px;
+    font-weight: 700;
+    appearance: none;
+    /* 🔸 ブラウザの矢印を非表示 */
+    background-color: transparent;
+    color: #5F5F5F;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.sell-form__select::after {
+    position: absolute;
+    top: 50%;
+    right: 16px;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 8px solid #B1B1B1;
+    content: "";
+    transform: translateY(-50%);
+}
+
+.sell-form__select-condition option {
+    background-color: #636769;
+    color: #FFFFFF;
+}
+
+.sell-form__input {
+    width: 100%;
+    height: 45px;
+    margin-top: 12px;
+    padding: 0 ８px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #5F5F5F;
+    border: 1px solid #5F5F5F;
+    border-radius: 4px;
+    line-height: 45px;
+}
+
+.sell-form__input-textarea {
+    width: 100%;
+    height: 125px;
+    margin-top: 12px;
+    padding: 12px 40px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #5F5F5F;
+    border: 1px solid #5F5F5F;
+    border-radius: 4px;
+}
+
+.button-sell {
+    margin-top: 125px;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 8px;
+}
