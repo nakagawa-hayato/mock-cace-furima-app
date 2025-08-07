@@ -10,6 +10,7 @@ use App\Models\CategoryItem;
 use App\Models\Favorite;
 use App\Models\Comment;
 use Illuminate\Http\Request;
+use App\Http\Requests\ItemRequest;
 
 class ItemController extends Controller
 {
@@ -63,19 +64,15 @@ class ItemController extends Controller
     }
 
     //商品出品登録処理
-    public function store(Request $request)
+    public function store(ItemRequest $request)
 {
     $dir = 'images';
-    $file_name = $request->file('image')->getClientOriginalName();
+    $file_name = $request->file('image')->hashName();
     $path = $request->file('image')->storeAs('public/' . $dir, $file_name);
 
     $item = new Item();
-    $item->name = $request->name;
-    $item->bland = $request->bland;
-    $item->price = $request->price;
-    $item->description = $request->description;
+    $item->fill($request->only(['name', 'bland', 'price', 'description', 'condition_id']));
     $item->image = 'storage/' . $dir . '/' . $file_name;
-    $item->condition_id = $request->condition_id;
     $item->user_id = auth()->id();
     $item->save();
 
@@ -88,11 +85,10 @@ class ItemController extends Controller
     return redirect('/')->with('status', '商品を登録しました');
 }
 
-
     public function show($item_id)
-    {
-        $item = Item::with('favorites','comments','categories','condition')->find($item_id);
+{
+    $item = Item::with('favorites', 'comments.user.profile', 'categories', 'condition')->findOrFail($item_id);
 
-            return view('detail',compact('item')); 
-    }
+    return view('detail', compact('item'));
+}
 }

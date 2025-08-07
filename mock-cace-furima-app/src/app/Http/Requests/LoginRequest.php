@@ -21,11 +21,21 @@ class LoginRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'email' => 'required | email',
-            'password' => 'required'
+            'password' => 'required | min:8',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.required'    => 'メールアドレスは必須です。',
+            'email.email'       => '有効なメールアドレスを入力してください。',
+            'password.required' => 'パスワードは必須です。',
+            'password.min'      => 'パスワードは8文字以上で入力してください。',
         ];
     }
 }

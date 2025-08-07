@@ -63,6 +63,8 @@ return [
             ]) : [],
         ],
 
+        //テスト用に複製
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),

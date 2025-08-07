@@ -11,7 +11,7 @@ class ProfileRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return auth()->check();
     }
@@ -21,25 +21,25 @@ class ProfileRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'display_name' => 'required|string|max:255',
             'post_code' => 'required|regex:/^\d{3}-\d{4}$/',
             'address' => 'required|string|max:255',
-            'building' => 'string|max:255',
-            'image' => 'image|mimes:jpeg,png,jpg',
+            'building' => 'nullable|string|max:255',
+            'profile_image' => 'nullable|image|mimes:jpeg,png,jpg',
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'display_name.required' => '名前を入力してください',
             'post_code.required' => '郵便番号を入力してください',
             'post_code.regex' => '郵便番号はXXX-XXXXの形式で入力してください',
             'address.required' => '住所を入力してください',
-            'image.mines' => '「.png」または「.jpeg」形式でアップロードしてください'
+            'profile_image.mines' => '「.png」または「.jpeg」形式でアップロードしてください'
         ];
     }
 }

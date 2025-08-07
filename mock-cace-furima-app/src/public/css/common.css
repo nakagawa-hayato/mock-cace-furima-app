@@ -2,7 +2,7 @@
 html,
 body {
     width: 100%;
-    height: 100%;
+    height: 100vh;
 }
 
 textarea::placeholder,
@@ -12,7 +12,7 @@ input::placeholder {
 
 .app {
     width: 100%;
-    height: 100%;
+    height: 100vh;
 }
 
 /* ヘッダー */
@@ -113,12 +113,35 @@ input::placeholder {
     flex-direction: column;
     flex-grow: 1;
     justify-content: center;
+    width: 100%;
+    height: 100vh;
 }
 
 .content__heading {
     text-align: center;
     font-weight: 700;
     font-size: 36px;
+}
+
+@media screen and (max-width: 1200px) {
+    .form-container,
+    .login-form__form,
+    .register-form__form,
+    .sell-form__form,
+    .edit-form__form {
+        width: 60vw;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .form-container,
+    .login-form__form,
+    .register-form__form,
+    .sell-form__form,
+    .edit-form__form {
+        width: 90vw;
+        padding: 48px 24px;
+    }
 }
 
 .btn {

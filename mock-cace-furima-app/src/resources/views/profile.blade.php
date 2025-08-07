@@ -5,7 +5,7 @@
 @endsection
 
 @section('content')
-<div class="profile">
+<div class="profile-form">
     <div class="profile-info">
         <div class="profile-image__area">
             <div class="profile-image__circle">

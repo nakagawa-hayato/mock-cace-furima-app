@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Order;
+use App\Http\Requests\PurchaseRequest;
+use App\Http\Requests\AddressRequest;
 use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
@@ -18,18 +20,16 @@ class PurchaseController extends Controller
     }
 
 
-    public function store(Request $request, $item_id)
+    public function store(PurchaseRequest $request, $item_id)
     {
         $item = Item::findOrFail($item_id);
 
         // 売却済みの場合はリダイレクト
         if ($item->is_sold) {
-        return redirect('/')->with('status', 'この商品はすでに購入済みです');
-    }
+            return redirect('/')->with('status', 'この商品はすでに購入済みです');
+        }
 
-        $validated = $request->validate([
-            'method' => 'required|string|max:255',
-        ]);
+        $method = $request->method;
 
         $post_code = session('order_post_code') ?? auth()->user()->profile->post_code;
         $address = session('order_address') ?? auth()->user()->profile->address;
@@ -146,18 +146,12 @@ class PurchaseController extends Controller
     }
 
 
-    public function update(Request $request, $item_id)
+    public function update(AddressRequest $request, $item_id)
     {
-        $validated = $request->validate([
-            'post_code' => 'required|regex:/^\d{3}-\d{4}$/',
-            'address' => 'required|string|max:255',
-            'building' => 'nullable|string|max:255',
-        ]);
-
         session([
-        'order_post_code' => $validated['post_code'],
-        'order_address' => $validated['address'],
-        'order_building' => $validated['building']?? '',
+        'order_post_code' => $request->post_code,
+        'order_address' => $request->address,
+        'order_building' => $request->building ?? '',
     ]);
 
         return redirect("/purchase/{$item_id}");

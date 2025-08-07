@@ -5,8 +5,8 @@
 @endsection
 
 @section('content')
-<div class="order">
-    <form class="address-form__form" action="/purchase/{{ $item->id }}" method="POST" enctype="multipart/form-data">
+<div class="order-form">
+    <form class="order-form__form" action="/purchase/{{ $item->id }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="order-contents">
             <div class="left-contents">

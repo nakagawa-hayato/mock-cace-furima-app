@@ -8,6 +8,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PurchaseController;
 use Illuminate\Support\Facades\Route;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -27,7 +28,7 @@ Route::get('/', [ItemController::class, 'index']);
 Route::get('/item/{item_id}', [ItemController::class, 'show']);
 
 //  ログイン後にしかアクセスできないページ
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', 'verified')->group(function () {
     Route::get('/sell', [ItemController::class, 'add']);
     Route::post('/sell', [ItemController::class, 'store']);
     Route::get('/purchase/{item_id}', [PurchaseController::class, 'purchase']);

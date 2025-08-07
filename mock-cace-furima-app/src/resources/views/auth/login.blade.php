@@ -28,6 +28,11 @@
                     @enderror
                 </p>
             </div>
+            <p class="login-form__error-message">
+                @error('user')
+                    {{ $message }}
+                @enderror
+            </p>
             <input class="login-form__btn btn" type="submit" value="ログインする">
         </form>
         <div class="footer__link">
