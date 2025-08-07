@@ -24,6 +24,7 @@
 - PHP 8.2.28
 - Laravel 8.83.29
 - MySQL 8.0.26
+- Mailhog 1.0.1
 
 ## ER 図
 
