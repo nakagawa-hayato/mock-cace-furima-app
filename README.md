@@ -27,7 +27,7 @@
 
 ## ER 図
 
-
+<img width="916" height="1031" alt="Image" src="https://github.com/user-attachments/assets/f753054c-8010-4d05-ad92-5f2b197b765b" />
 
 ## URL
 
