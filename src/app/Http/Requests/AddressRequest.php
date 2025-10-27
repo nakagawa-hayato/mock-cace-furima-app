@@ -34,7 +34,7 @@ class AddressRequest extends FormRequest
     {
         return [
             'post_code.required' => '郵便番号を入力してください。',
-            'post_code.regex' => '郵便番号の形式が正しくありません（例：123-4567）。',
+            'post_code.regex' => '郵便番号の形式が正しくありません（例:123-4567）。',
             'address.required' => '住所を入力してください。',
         ];
     }

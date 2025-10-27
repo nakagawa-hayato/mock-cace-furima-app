@@ -39,7 +39,7 @@ class ProfileRequest extends FormRequest
             'post_code.required' => '郵便番号を入力してください',
             'post_code.regex' => '郵便番号はXXX-XXXXの形式で入力してください',
             'address.required' => '住所を入力してください',
-            'profile_image.mines' => '「.png」または「.jpeg」形式でアップロードしてください'
+            'profile_image.mimes' => '「.png」または「.jpeg」形式でアップロードしてください'
         ];
     }
 }

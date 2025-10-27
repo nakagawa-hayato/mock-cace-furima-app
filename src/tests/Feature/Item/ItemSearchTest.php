@@ -2,69 +2,44 @@
 
 namespace Tests\Feature\Item;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Item;
-use App\Models\Condition;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ItemSearchTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        // 各 Item に必要な条件
-        $this->condition = Condition::factory()->create();
-    }
-
     /** @test */
     public function 部分一致する商品が検索結果に表示される()
     {
-        Item::factory()->create([
-            'name' => 'スマートフォン',
-            'condition_id' => $this->condition->id,
-        ]);
+        Item::factory()->create(['name' => 'デジカメ']);
+        Item::factory()->create(['name' => 'ノートPC']);
 
-        Item::factory()->create([
-            'name' => 'タブレット',
-            'condition_id' => $this->condition->id,
-        ]);
-
-        $response = $this->get('/?keyword=スマ');
-
+        $response = $this->get('/?keyword=デジ');
         $response->assertStatus(200);
-        $response->assertSee('スマートフォン');
-        $response->assertDontSee('タブレット');
+        $response->assertSee('デジカメ');
+        $response->assertDontSee('ノートPC');
     }
 
     /** @test */
     public function ホームページで検索すると結果が表示される()
     {
-        Item::factory()->create([
-            'name' => 'パソコン',
-            'condition_id' => $this->condition->id,
-        ]);
+        Item::factory()->create(['name' => 'カメラ']);
+        Item::factory()->create(['name' => 'スマホ']);
 
-        $response = $this->get('/?keyword=パソ');
-
+        $response = $this->get('/?keyword=カメラ');
         $response->assertStatus(200);
-        $response->assertSee('パソコン');
+        $response->assertSee('カメラ');
+        $response->assertDontSee('スマホ');
     }
 
     /** @test */
     public function マイリストで検索するとキーワードが保持される()
     {
         $user = User::factory()->create();
-
-        // ログインユーザーの商品をいいねした設定
-        $item = Item::factory()->create([
-            'name' => 'デジカメ',
-            'condition_id' => $this->condition->id,
-        ]);
+        $item = Item::factory()->create(['name' => 'デジカメ']);
         $user->favoriteItems()->attach($item->id);
 
         $response = $this
@@ -74,7 +49,7 @@ class ItemSearchTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('デジカメ');
 
-        // キーワード保持（フォーム入力欄にvalueとして入っているか）
+        // フォーム入力欄に value として保持されているか
         $response->assertSee('value="デジ"', false);
     }
 }

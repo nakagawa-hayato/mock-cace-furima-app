@@ -3,14 +3,10 @@
 namespace Tests\Feature\User;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Profile;
 use App\Models\Item;
-use App\Models\Order;
-use App\Models\Condition;
-
 
 class UserProfileTest extends TestCase
 {
@@ -24,14 +20,8 @@ class UserProfileTest extends TestCase
             'image' => 'default.png',
         ]))->create();
 
+        // 出品した商品（売却済みフラグを立てる）
         $item = Item::factory()->for($user, 'user')->create(['name' => '出品カメラ', 'is_sold' => true]);
-        Order::create([
-            'user_id' => $user->id,
-            'item_id' => $item->id,
-            'method' => 'カード支払い',
-            'post_code' => '000-0000',
-            'address' => '東京都渋谷区',
-        ]);
 
         $this->actingAs($user);
         $response = $this->get('/mypage');

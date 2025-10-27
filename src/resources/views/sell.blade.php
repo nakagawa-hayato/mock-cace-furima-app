@@ -14,9 +14,9 @@
                 <label class="sell-form__label">商品画像</label>
                 <div class="sell-form__image-contents">
                     <div class="sell-form__image">
-                        <input type="file" name="item_image" id="item_image" >
+                        <input type="file" name="image" id="item_image" >
                         @if (!empty($item->image))
-                            <img class="sell-image" src="{{ asset('storage/' . $item->image) }}" alt="商品画像">
+                            <img class="sell-image" src="{{ \Storage::url($item->image) }}" alt="商品画像">
                         @else
                             <div class="sell-form__image-select">
                                 <label for="item_image">画像を選択する</label>
@@ -78,9 +78,9 @@
                     @enderror
                 </div>
                 <div class="sell-form__content">
-                    <label class="sell-form__label" for="bland">ブランド名</label>
-                    <input class="sell-form__input" type="text" name="bland" id="bland">
-                    @error('bland')
+                    <label class="sell-form__label" for="brand">ブランド名</label>
+                    <input class="sell-form__input" type="text" name="brand" id="brand">
+                    @error('brand')
                         <p class="error-message">{{ $message }}</p>
                     @enderror
                 </div>
@@ -104,4 +104,56 @@
         </form>
     </div>
 </div>
+
+{{-- sell.blade.php の末尾に追加（@endsection の直前） --}}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const fileInput = document.getElementById('item_image');
+  if (!fileInput) return;
+
+  fileInput.addEventListener('change', handleImageSelect);
+
+  function handleImageSelect(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    // MIME とサイズチェック（必要ならメッセージをカスタマイズ）
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!allowedTypes.includes(file.type)) {
+      alert('画像は JPEG / PNG のみアップロード可能です。');
+      fileInput.value = '';
+      return;
+    }
+    if (file.size > maxSize) {
+      alert('画像サイズは 5MB 以下にしてください。');
+      fileInput.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const container = document.querySelector('.sell-form__image');
+      if (!container) return;
+
+      // 既存のプレビュー画像や「画像を選択する」ラベルを消す
+      const existingImg = container.querySelector('img.sell-image');
+      const placeholder = container.querySelector('.sell-form__image-select');
+      if (existingImg) existingImg.remove();
+      if (placeholder) placeholder.remove();
+
+      // 画像要素を作って挿入
+      const img = document.createElement('img');
+      img.src = ev.target.result;
+      img.alt = '選択した画像プレビュー';
+      img.className = 'sell-image';
+      // 必要ならスタイルやデータ属性を追加
+      container.appendChild(img);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+</script>
+
 @endsection

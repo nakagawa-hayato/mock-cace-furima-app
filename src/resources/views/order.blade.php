@@ -13,14 +13,14 @@
                 <div class="left-content">
                     <div class="item-info__area">
                         <div class="item-image">
-                            <img src="{{ asset('storage/' . $item->image) }}" alt="商品画像" class="image">
+                            <img src="{{ \Storage::url($item->image) }}"  alt="商品画像" class="image">
                         </div>
                         <div class="item-info">
                             <div class="item-name">
                                 <label>{{ $item->name }}</label>
                             </div>
                             <div class="item-price">
-                                <span>¥</span><span class="price">{{ $item->price }}<span>
+                                <span>¥</span><span class="price">{{ $item->price }}</span>
                             </div>
                         </div>
                     </div>
@@ -29,14 +29,14 @@
                 <div class="left-content">
                     <label class="left-content__label">支払い方法</label>
                     <div class="select-wrapper">
-                    <select class="select" name="method" >
-                        <option value="" disabled selected hidden>選択してください</option>
-                        <option value="カード支払い" {{ old('method') == 'カード支払い' ? 'selected' : '' }}>カード支払い</option>
-                        <option class="select-option" value="コンビニ支払い" {{ old('method') == 'コンビニ支払い' ? 'selected' : '' }}>コンビニ支払い</option>
-                    </select>
-                    @error('method')
-                        <p class="error">{{ $message }}</p>
-                    @enderror
+                        <select class="select" id="payment" name="payment_method" required>
+                            <option value="" disabled selected hidden>選択してください</option>
+                            <option value="card" {{ old('payment_method') == 'card' ? 'selected' : '' }}>クレジットカード支払い</option>
+                            <option value="konbini" {{ old('payment_method') == 'konbini' ? 'selected' : '' }}>コンビニ支払い</option>
+                        </select>
+                        @error('payment_method')
+                            <p class="error">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
                 
@@ -46,24 +46,17 @@
                         <a href="/purchase/address/{{ $item->id }}" class="btn-secondary">変更する</a>
                     </div>
                     <div class="address">
-                    @php
-                        $profile = auth()->user()->profile;
-                    @endphp
-
-                    @if (session()->has('order_post_code') || session()->has('order_address'))
-                        <p>
-                        〒{{ session('order_post_code') ?? $profile->post_code }}<br>
-                        {{ session('order_address') ?? $profile->address }}
-                        {{ session('order_building') ?? $profile->building }}
-                        </p>
-                    @else
-                        {{-- プロフィールからの情報を表示 --}}
-                        <p>
-                            〒{{ $profile->post_code }}<br>
-                            {{ $profile->address }}
-                            {{ $profile->building }}
-                        </p>
-                    @endif
+                        <label>〒 
+                            <input class="input_destination" name="post_code" 
+                                value="{{ old('post_code', $address['post_code'] ?? '') }}" readonly>
+                        </label>
+                        <br>
+                        <input class="input_destination" name="address" 
+                            value="{{ old('address', $address['address'] ?? '') }}" readonly>
+                        @if (!empty($address['building']))
+                            <input class="input_destination" name="building" 
+                                value="{{ old('building', $address['building'] ?? '') }}" readonly>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -76,12 +69,40 @@
                     </div>
                     <div class="confirm-content">
                         <label class="confirm-label">支払い方法</label>
-                        <p class="confirm-text">コンビニ支払い</p>
+                        <p class="confirm-text" id="confirm-payment">
+                            {{ old('payment_method') ? (old('payment_method') === 'card' ? 'クレジットカード支払い' : 'コンビニ支払い') : '未選択' }}
+                        </p>
                     </div>
                 </div>
-                    <button type="submit" class="btn btn-primary">購入する</button>
+                <button type="submit" class="btn btn-primary">購入する</button>
             </div>
         </div>
     </form>
 </div>
+
+<!-- 支払い選択を確認領域に反映する JS -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const select = document.getElementById('payment');
+    const confirmEl = document.getElementById('confirm-payment');
+
+    function updateConfirm() {
+        const v = select ? select.value : null;
+        if (v === 'card') {
+            confirmEl.textContent = 'クレジットカード支払い';
+        } else if (v === 'konbini') {
+            confirmEl.textContent = 'コンビニ支払い';
+        } else {
+            confirmEl.textContent = '未選択';
+        }
+    }
+
+    // ページ読み込み時に初期表示を合わせる
+    updateConfirm();
+
+    if (select) {
+        select.addEventListener('change', updateConfirm);
+    }
+});
+</script>
 @endsection

@@ -9,7 +9,7 @@ class Item extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['item_id','condition_id','name','bland','price', 'description','image']; // 必要に応じて
+    protected $fillable = ['user_id','condition_id','name','brand','price', 'description','image']; // 必要に応じて
 
     protected $casts = ['is_sold' => 'boolean',];
 

@@ -66,5 +66,69 @@
         </form>
     </div>
 </div>
+
+{{-- edit.blade.php の末尾に追加（@endsection の直前） --}}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const fileInput = document.getElementById('profile_image');
+  const container = document.querySelector('.edit-form__image');
+  const triggerLabel = document.querySelector('.edit-form__image-select label') || document.querySelector('.edit-form__image-select');
+
+  if (!fileInput || !container) return;
+
+  // クリックでファイル選択を開く（プレビューまたはラベルをクリック）
+  container.style.cursor = 'pointer';
+  container.addEventListener('click', () => fileInput.click());
+  if (triggerLabel) triggerLabel.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', handleImageSelect);
+
+  function handleImageSelect(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    // MIME とサイズチェック
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+
+    if (!allowedTypes.includes(file.type)) {
+      alert('画像は JPEG / PNG のみアップロード可能です。');
+      fileInput.value = '';
+      return;
+    }
+    if (file.size > maxSize) {
+      alert('画像サイズは 5MB 以下にしてください。');
+      fileInput.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      // 既存のプレビュー画像やプレースホルダーを削除
+      const existingImg = container.querySelector('img.edit-image');
+      const placeholder = container.querySelector('.placeholder-circle');
+
+      if (existingImg) existingImg.remove();
+      if (placeholder) placeholder.remove();
+
+      // 画像要素を作って挿入
+      const img = document.createElement('img');
+      img.src = ev.target.result;
+      img.alt = '選択したプロフィール画像プレビュー';
+      img.className = 'edit-image';
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'cover';
+      img.style.borderRadius = '50%';
+      container.appendChild(img);
+
+      // 画像をクリックすると再選択できるように
+      img.addEventListener('click', () => fileInput.click());
+    };
+    reader.readAsDataURL(file);
+  }
+});
+</script>
+
 @endsection
 

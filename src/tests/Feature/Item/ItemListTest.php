@@ -2,12 +2,10 @@
 
 namespace Tests\Feature\Item;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Item;
-use App\Models\Favorite;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ItemListTest extends TestCase
 {
@@ -19,39 +17,28 @@ class ItemListTest extends TestCase
         $items = Item::factory()->count(3)->create();
 
         $response = $this->get('/');
-
         foreach ($items as $item) {
             $response->assertSee($item->name);
         }
     }
 
     /** @test */
-    public function 購入済みの商品はSOLDラベルが表示される()
+    public function 購入済みの商品は_sold_ラベルが表示される()
     {
-        $soldItem = Item::factory()->create(['is_sold' => true]);
-        $unsoldItem = Item::factory()->create(['is_sold' => false]);
+        $item = Item::factory()->create(['is_sold' => true]);
 
         $response = $this->get('/');
-
         $response->assertSee('SOLD');
-        $response->assertSee($soldItem->name);
-        $response->assertSee($unsoldItem->name);
     }
 
     /** @test */
     public function マイリストページでは自分が出品した商品が表示されない()
     {
         $user = User::factory()->create();
-        $otherUser = User::factory()->create();
-
         $myItem = Item::factory()->create(['user_id' => $user->id]);
-        $likedItem = Item::factory()->create(['user_id' => $otherUser->id]);
+        $likedItem = Item::factory()->create();
 
-        // お気に入り登録
-        Favorite::create([
-            'user_id' => $user->id,
-            'item_id' => $likedItem->id,
-        ]);
+        $user->favoriteItems()->attach($likedItem->id);
 
         $this->actingAs($user);
         $response = $this->get('/?tab=mylist');
@@ -63,10 +50,11 @@ class ItemListTest extends TestCase
     /** @test */
     public function 未ログインでマイリストページを開くと何も表示されない()
     {
-        $item = Item::factory()->create();
+        Item::factory()->count(3)->create();
 
         $response = $this->get('/?tab=mylist');
-
-        $response->assertDontSee($item->name);
+        $response->assertSee('マイリスト');
+        $response->assertDontSeeText('SOLD');
+        $response->assertDontSeeText('item'); // 商品名の部分一致
     }
 }

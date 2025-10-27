@@ -86,13 +86,15 @@
     flex-wrap: wrap;
     gap: 20px 10px;
 }
-.sell-form__category-item {
+.sell-form__category-item label {
+    display: inline-block;
     padding: 3px 18px;
     color: #FF5555;
     border: 1px solid #FF5555;
     border-radius: 15px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s,
+        color 0.3s;
     background: #FFFFFF;
     text-align: center;
 }

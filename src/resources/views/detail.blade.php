@@ -8,12 +8,16 @@
 <div class="detail-form">
     <div class="detail-contents">
         <div class="left-contents">
-            <img src="{{ asset('storage/' . $item->image) }}" alt="商品画像" class="item-img">
+            <img src="{{ \Storage::url($item->image) }}" alt="商品画像" class="item-img">
+            {{-- 売れていれば「SOLD」表示 --}}
+                    @if ($item->is_sold)
+                        <span class="sold-label">SOLD</span>
+                    @endif
         </div>
         <div class="right-contents">
             <div class="right-content">
                 <label class="item-name">{{ $item->name }}</label>
-                <span class="item-bland">{{ $item->bland }}</span>
+                <span class="item-brand">{{ $item->brand }}</span>
                 <p><span>¥</span><span class="item-price">{{ number_format($item->price) }}</span><span> (税込)</span></p>
                 
                 <div class="count-area">
@@ -74,7 +78,7 @@
                         <div class="user-info">
                             <div class="profile-image__circle">
                                 @if ($comment->user->profile->image)
-                                    <img src="{{ asset('storage/' . $comment->user->profile->image) }}" alt="プロフィール画像" class="profile-image">
+                                    <img src="{{ \Storage::url($comment->user->profile->image) }}" alt="プロフィール画像" class="profile-image">
                                 @else
                                     <div class="placeholder-circle"></div>
                                 @endif
@@ -91,19 +95,18 @@
             
             <div class="right-content">
                 <label class="comment-input">商品へのコメント</label>
-                @auth
-                    <form action="/comment" method="POST">
-                        @csrf
+                <form action="/comment" method="POST">
+                    @csrf
+                    @auth
                         <input type="hidden" name="item_id" value="{{ $item->id }}">
-                        <textarea cols="30" rows="5" name="comment" class="comment__input-box">{{ old('comment') }}</textarea>
-                        @error('comment')
-                        <p class="error">
-                            {{ $message }
-                        }</p>
-                        @enderror
-                        <button type="submit" class="btn btn-comment">コメントを送信する</button>
-                    </form>
-                @endauth
+                    @endauth
+                    <textarea cols="30" rows="5" name="comment" class="comment__input-box">{{ old('comment') }}</textarea>
+                    @error('comment')
+                    <p class="error">
+                        {{ $message }}</p>
+                    @enderror
+                    <button type="submit" class="btn btn-comment">コメントを送信する</button>
+                </form>
             </div>
         </div>
     </div>

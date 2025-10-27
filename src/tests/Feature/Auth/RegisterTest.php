@@ -3,7 +3,6 @@
 namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class RegisterTest extends TestCase
@@ -81,8 +80,9 @@ class RegisterTest extends TestCase
     }
 
     /** @test */
-    public function 入力が正しければ会員登録に成功してマイページに遷移する()
+    public function 入力が正しければ会員登録に成功して確認画面に遷移する()
     {
+        // 正常な登録
         $response = $this->post('/register', [
             'name' => 'テストユーザー',
             'email' => 'test@example.com',
@@ -90,10 +90,13 @@ class RegisterTest extends TestCase
             'password_confirmation' => 'password123',
         ]);
 
-        $response->assertRedirect('/mypage/profile');
-        $this->assertAuthenticated();
+        // コントローラが verification.notice にリダイレクトする実装なのでそれを期待
+        $response->assertRedirect(route('verification.notice'));
+        // 登録は DB に反映されていること
         $this->assertDatabaseHas('users', [
             'email' => 'test@example.com',
         ]);
+        // 登録時に自動ログインしていない実装と想定（session に unauthenticated_user を入れているため）
+        $this->assertGuest();
     }
 }

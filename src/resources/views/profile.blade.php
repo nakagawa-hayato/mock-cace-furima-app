@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('css')
+<link rel="stylesheet" href="{{ asset('/css/index.css')  }}" >
 <link rel="stylesheet" href="{{ asset('css/profile.css') }}">
 @endsection
 
@@ -10,7 +11,7 @@
         <div class="profile-image__area">
             <div class="profile-image__circle">
                 @if ($profile->image)
-                    <img src="{{ asset('storage/' . $profile->image) }}" alt="プロフィール画像" class="profile-image">
+                    <img src="{{ \Storage::url($profile->image) }}" alt="プロフィール画像" class="profile-image">
                 @else
                     <div class="placeholder-circle"></div>
                 @endif
@@ -41,7 +42,7 @@
             @foreach ($items as $item)
                 <div class="item-content">
                     <a href="/item/{{ $item->id }}" class="item-link"></a>
-                    <img src="{{ asset('storage/' . $item->image) }}" alt="商品画像" class="item-img" />
+                    <img src="{{ \Storage::url($item->image) }}" alt="商品画像" class="item-img" />
                     <p class="item-name">{{$item->name}}</p>
 
                     {{-- 売れていれば「SOLD」表示 --}}

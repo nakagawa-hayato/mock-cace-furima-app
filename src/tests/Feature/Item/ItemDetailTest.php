@@ -3,7 +3,6 @@
 namespace Tests\Feature\Item;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Profile;
@@ -16,7 +15,7 @@ class ItemDetailTest extends TestCase
 {
     use RefreshDatabase;
 
-/** @test */
+    /** @test */
     public function 商品詳細ページに必要な情報がすべて表示される()
     {
         // コメントユーザーとプロフィール作成
@@ -49,7 +48,7 @@ class ItemDetailTest extends TestCase
             ->for($condition)
             ->create([
                 'name' => 'デジタルカメラ',
-                'bland' => 'CANON',
+                'brand' => 'CANON',
                 'price' => 25000,
                 'description' => '高画質なカメラです',
                 'image' => 'camera.jpg',

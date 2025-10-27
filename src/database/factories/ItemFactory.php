@@ -19,7 +19,7 @@ class ItemFactory extends Factory
         'is_sold' => false,
         'user_id' => \App\Models\User::factory(),
         'condition_id' => Condition::factory(),
-        'bland' => $this->faker->word,
+        'brand' => $this->faker->company,
         'description' => $this->faker->sentence(10), // 商品説明
             'image' => 'images/test.jpg', // テスト用のダミーパス（storage/public/images/test.jpg など）
         ];

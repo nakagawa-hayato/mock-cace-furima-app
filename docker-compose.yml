@@ -1,6 +1,9 @@
+version: '3.8'
+
 services:
     nginx:
         image: nginx:1.21.1
+        platform: linux/amd64
         ports:
             - "80:80"
         volumes:
@@ -10,12 +13,17 @@ services:
             - php
 
     php:
-        build: ./docker/php
+        build:
+            context: ./docker/php
+            args:
+              APT_MIRROR: archive.debian.org
+        platform: linux/amd64
         volumes:
             - ./src:/var/www/
 
     mysql:
         image: mysql:8.0.26
+        platform: linux/amd64
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: laravel_db
@@ -29,6 +37,7 @@ services:
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
+        platform: linux/amd64
         environment:
             - PMA_ARBITRARY=1
             - PMA_HOST=mysql
@@ -41,6 +50,7 @@ services:
     
     mailhog:
         image: mailhog/mailhog
+        platform: linux/amd64
         ports:
         - "1025:1025" # SMTP
         - "8025:8025" # Web UI

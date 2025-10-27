@@ -25,7 +25,7 @@ class ItemRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'bland' => ['nullable', 'string'],
+            'brand' => ['nullable', 'string'],
             'price' => ['required', 'integer', 'min:0'],
             'description' => ['required', 'string', 'max:255'],
             'condition_id' => ['required'],

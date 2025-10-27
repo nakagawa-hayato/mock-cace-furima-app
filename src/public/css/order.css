@@ -130,6 +130,16 @@
     font-weight: semibold;
 }
 
+.input_destination {
+    border: none;    /* 枠線を消す */
+    background: transparent;    /* 背景色を消す */
+    outline: none;    /* フォーカス時の輪郭を消す */
+    pointer-events: none;
+    font-size: inherit;    /* 親のフォントに合わせる */
+    font-weight: inherit;
+    color: inherit;    /* 親の色を使う */
+}
+
 .right-contents {
     width: 30%;
 }

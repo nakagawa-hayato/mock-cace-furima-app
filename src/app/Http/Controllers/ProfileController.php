@@ -15,11 +15,14 @@ class ProfileController extends Controller
         $user = auth()->user();
         $profile = $user->profile;
 
-        $tab = $request->query('tab', 'sell');  // デフォルトは「sell」
+        // タブの指定（デフォルト sell）
+        $tab = $request->query('tab', 'sell');
 
         if ($tab === 'buy') {
-        $items = $user->orders()->with('item')->get()->pluck('item');
+            // 購入した商品のみ取得
+            $items = $user->orders()->with('item')->get()->pluck('item');
         } else {
+            // 出品した商品のみ取得
             $items = $user->items;
         }
 
@@ -34,12 +37,9 @@ class ProfileController extends Controller
         $user = auth()->user();
         $profile = $user->profile; // hasOne リレーション
 
-        if ($request->session()->pull('just_registered')) {
-            // 登録直後 → 空のプロフィールフォームを表示
-            $profile = new \App\Models\Profile();
-        } elseif (!$profile) {
-            // プロフィール未作成 → 空のインスタンス（表示上便利なため）
-            $profile = new \App\Models\Profile();
+        // 登録直後や未作成の場合は空インスタンスを返す
+        if ($request->session()->pull('just_registered') || !$profile) {
+            $profile = new Profile();
         }
 
         return view('edit', compact('profile'));
@@ -57,20 +57,19 @@ class ProfileController extends Controller
 
             // ディレクトリ名を任意の名前で設定します
             $dir = 'images';
-
-            // アップロードされたファイル名を取得
-            $file_name = uniqid() . '_' . $request->file('profile_image')->getClientOriginalName();
-
-            // imageディレクトリを作成し画像を保存
-            // storage/app/public/任意のディレクトリ名/
+            // hashName() でユニークファイル名生成
+            $file_name = $request->file('profile_image')->hashName();
+            // public ディスクに保存
             $request->file('profile_image')->storeAs('public/' . $dir, $file_name);
-
+            // 保存パスを $validated にセット
             $validated['image'] = $dir . '/' . $file_name;
 
         }
 
         // プロフィールがなければ作成、あれば更新
-        $user->profile()->updateOrCreate([], $validated);
+        $user->profile()->updateOrCreate(
+            ['user_id' => $user->id], // 条件を明示
+            $validated);
 
         return redirect('/')->with('status', 'プロフィールを保存しました');
     }

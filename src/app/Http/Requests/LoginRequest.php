@@ -2,9 +2,11 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use Laravel\Fortify\Http\Requests\LoginRequest as FortifyLoginRequest;
 
-class LoginRequest extends FormRequest
+//デフォルトのログイン機能には上述のFortifyLoginRequestクラスが引数として渡されているため、異なるクラスを呼び出すとエラーが出力される。
+//そのため、デフォルトにある上述のFortifyLoginRequestクラスを継承する必要がある
+class LoginRequest extends FortifyLoginRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,21 +23,21 @@ class LoginRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules()
     {
         return [
-            'email' => 'required | email',
-            'password' => 'required | min:8',
+            'email' => ['required', 'email'],
+            'password' => ['required', 'min:8']
         ];
     }
 
-    public function messages(): array
+    public function messages()
     {
         return [
-            'email.required'    => 'メールアドレスは必須です。',
-            'email.email'       => '有効なメールアドレスを入力してください。',
-            'password.required' => 'パスワードは必須です。',
-            'password.min'      => 'パスワードは8文字以上で入力してください。',
+            'email.required' => 'メールアドレスを入力してください',
+            'email.email' => 'メール形式で入力してください',
+            'password.required' => 'パスワードを入力してください',
+            'password.min' => 'パスワードは8文字以上で入力してください',
         ];
     }
 }

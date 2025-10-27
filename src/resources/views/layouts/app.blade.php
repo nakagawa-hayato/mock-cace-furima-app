@@ -16,18 +16,33 @@
         <header class="header">
             <div class="header__heading">
                 <a href="/" class="logo">
-                    <img src="{{ asset('storage/images/logo.svg') }}" alt="タイトル画像" class="img-logo-svg" />
+                    <img src="{{ asset('storage/images/logo.png') }}" alt="タイトル画像" class="img-logo-png" />
                 </a>
             </div>
             @yield('link')
 
             @if (!Request::is('login') && !Request::is('register'))
-                <div class="search-form">
-                    <form class="search" action="/" method="GET" >
-                        <input type="text" name="keyword" class="keyword" placeholder="なにをお探しですか？" value="{{ request('keyword') }}">
+                <div class="search-wrapper">
+                    <form class="search-form" action="/" method="GET" role="search">
+                        <!-- 白い入力枠（ここだけボックス）-->
+                        <div class="search-box">
+                        <input
+                            type="text"
+                            name="keyword"
+                            class="keyword"
+                            placeholder="なにをお探しですか？"
+                            value="{{ request('keyword') }}"
+                            aria-label="検索ワード">
+                        </div>
 
+                        <!-- ボタンは白枠の外側に独立して置く -->
+                        <button type="submit" class="search-button" aria-label="検索">
+                        <img src="{{ asset('storage/images/search_icon.jpeg') }}" alt="検索" />
+                        </button>
+
+                        <!-- mylist タブを維持したい場合（必要なら） -->
                         @if (request('tab') === 'mylist')
-                            <input type="hidden" name="tab" value="mylist">
+                        <input type="hidden" name="tab" value="mylist">
                         @endif
                     </form>
                 </div>

@@ -6,28 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateCategoryItemTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::create('category_item', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('item_id')->constrained()->onDelete('cascade');;
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');;
+            // 外部キーは items, categories を参照。削除時は cascade で関連レコードも削除。
+            $table->foreignId('item_id')->constrained()->onDelete('cascade');
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
-        Schema::dropIfExists('item_category');
+        // 正しいテーブル名で dropIfExists
+        Schema::dropIfExists('category_item');
     }
 }

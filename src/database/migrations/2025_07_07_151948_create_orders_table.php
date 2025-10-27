@@ -17,10 +17,9 @@ class CreateOrdersTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('item_id')->constrained()->onDelete('cascade');
-            $table->string('method');
-            $table->string('post_code');
-            $table->string('address');
-            $table->string('building')->nullable();
+            $table->string('sending_postcode');
+            $table->string('sending_address');
+            $table->string('sending_building')->nullable();
             $table->timestamps();
 
             // 1商品1回しか買えない場合は重複防止

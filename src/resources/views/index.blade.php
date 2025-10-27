@@ -16,7 +16,7 @@
             @foreach ($items as $item)
                 <div class="item-content">
                     <a href="/item/{{ $item->id }}" class="item-link"></a>
-                    <img src="{{ asset('storage/' . $item->image) }}" alt="商品画像" class="item-img" />
+                    <img src="{{ \Storage::url($item->image) }}"  alt="商品画像" class="item-img" />
                     <p class="item-name">{{$item->name}}</p>
 
                     {{-- 売れていれば「SOLD」表示 --}}
