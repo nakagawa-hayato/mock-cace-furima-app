@@ -3,7 +3,6 @@
 namespace Tests\Feature\Purchase;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Profile;
@@ -42,9 +41,9 @@ class PurchaseTest extends TestCase
 
         $this->actingAs($buyer);
 
-        // 事前にセッションへ情報を保存（通常Stripeが保存するもの）
+        // コントローラ実装に合わせてセッションキーを設定
         session([
-            'order_method' => 'コンビニ支払い',
+            'order_payment' => 'konbini', // controller expects 'order_payment'
             'order_post_code' => $buyer->profile->post_code,
             'order_address' => $buyer->profile->address,
             'order_building' => $buyer->profile->building,
@@ -54,47 +53,48 @@ class PurchaseTest extends TestCase
         $response = $this->get("/purchase/success/{$item->id}");
 
         $response->assertRedirect('/');
-        $response->assertSessionHas('status', '購入が完了しました');
+        // controller sets flashSuccess => '決済が完了しました！'
+        $response->assertSessionHas('flashSuccess', '決済が完了しました！');
 
+        // DB のカラム名は controller に合わせる（sending_*）
         $this->assertDatabaseHas('orders', [
             'user_id' => $buyer->id,
             'item_id' => $item->id,
-            'method' => 'コンビニ支払い',
+            'sending_postcode' => $buyer->profile->post_code,
+            'sending_address' => $buyer->profile->address,
+            'sending_building' => $buyer->profile->building,
         ]);
 
         $this->assertTrue(Item::find($item->id)->is_sold);
     }
 
     /** @test */
-public function 購入した商品がプロフィール購入履歴に表示される()
-{
-    $buyer = User::factory()->has(Profile::factory())->create();
-    $item = Item::factory()->for($buyer, 'user')->create([
-        'is_sold' => true,
-        'name' => '高級カメラ',
-        'image' => 'camera.jpg',
-    ]);
+    public function 購入した商品がプロフィール購入履歴に表示される()
+    {
+        $buyer = User::factory()->has(Profile::factory())->create();
+        $item = Item::factory()->for($buyer, 'user')->create([
+            'is_sold' => true,
+            'name' => '高級カメラ',
+            'image' => 'camera.jpg',
+        ]);
 
-    // 購入履歴に追加
-    Order::create([
-        'user_id' => $buyer->id,
-        'item_id' => $item->id,
-        'method' => 'カード支払い',
-        'post_code' => '123-4567',
-        'address' => '東京都港区',
-        'building' => 'テストビル',
-    ]);
+        // 購入履歴に追加（Order テーブルのカラム名に合わせる）
+        Order::create([
+            'user_id' => $buyer->id,
+            'item_id' => $item->id,
+            'sending_postcode' => '123-4567',
+            'sending_address' => '東京都港区',
+            'sending_building' => 'テストビル',
+        ]);
 
-    $this->actingAs($buyer);
+        $this->actingAs($buyer);
 
-    $response = $this->get('/mypage');
+        $response = $this->get('/mypage');
 
-    $response->assertStatus(200);
-    $response->assertSee('高級カメラ'); // 商品名表示の確認
-
-    // ↓ SOLDであることを明示的に表示しているかチェック（index.blade.phpと合わせる）
-    $response->assertSee('SOLD');
-}
+        $response->assertStatus(200);
+        $response->assertSee('高級カメラ'); // 商品名表示の確認
+        $response->assertSee('SOLD');
+    }
 
     /** @test */
     public function 未ログインでは購入ページにアクセスできない()

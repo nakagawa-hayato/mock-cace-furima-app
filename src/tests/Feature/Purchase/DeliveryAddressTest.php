@@ -3,7 +3,6 @@
 namespace Tests\Feature\Purchase;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Profile;
@@ -53,7 +52,8 @@ class DeliveryAddressTest extends TestCase
         $response = $this->get("/purchase/{$item->id}");
 
         $response->assertStatus(200);
-        $response->assertSee('〒123-4567');
+        // HTML では「〒」と input が分かれる可能性があるので郵便番号だけを検証
+        $response->assertSee('123-4567');
         $response->assertSee('東京都渋谷区');
         $response->assertSee('新ビル101');
     }
@@ -73,9 +73,9 @@ class DeliveryAddressTest extends TestCase
             'building' => 'ミッドタワー34F',
         ]);
 
-        // 2. Stripeの代わりに直接成功URLを呼び出す（セッション再設定）
+        // 2. セッションに保存（controller は order_payment などを使うがここは success を直接呼ぶ）
         session([
-            'order_method' => 'コンビニ支払い',
+            'order_payment' => 'konbini',
             'order_post_code' => '111-2222',
             'order_address' => '東京都港区',
             'order_building' => 'ミッドタワー34F',
@@ -84,12 +84,14 @@ class DeliveryAddressTest extends TestCase
         $response = $this->get("/purchase/success/{$item->id}");
 
         $response->assertRedirect('/');
+
+        // DB のカラム名は controller 実装に合わせて sending_* を検証
         $this->assertDatabaseHas('orders', [
             'item_id' => $item->id,
             'user_id' => $user->id,
-            'post_code' => '111-2222',
-            'address' => '東京都港区',
-            'building' => 'ミッドタワー34F',
+            'sending_postcode' => '111-2222',
+            'sending_address' => '東京都港区',
+            'sending_building' => 'ミッドタワー34F',
         ]);
     }
 }
