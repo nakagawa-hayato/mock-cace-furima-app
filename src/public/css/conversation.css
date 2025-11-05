@@ -1,0 +1,754 @@
+/* --- 全体ラッパー --- */
+.conversation-page,
+.conversation-form {
+    display: flex;
+    box-sizing: border-box;
+    min-height: calc(100vh - 80px);
+}
+
+/* --- サイドバー（整理版） --- */
+.conversation-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 260px;
+    box-sizing: border-box;
+    background-color: #868686;
+    /* 元の色 */
+    padding: 16px 28px;
+    /* 余白を確保 */
+}
+
+/* 見出し */
+.conversation-sidebar__heading {
+    color: #FFFFFF;
+    font-size: 30px;
+    letter-spacing: 0.1em;
+    margin: 0 0 64px 0;
+    line-height: 1;
+}
+
+/* リスト本体 */
+.conversation-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+/* 各アイテム */
+.conversation-list__item {
+    background-color: #EEEFEB;
+    /* 元の背景 */
+    margin-bottom: 32px;
+    border-radius: 5px;
+    text-align: center;
+    transition: background-color .12s ease;
+}
+
+/* リンク全体をブロック化 */
+.conversation-list__item .conversation-link {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: inherit;
+}
+
+/* アイテム内のブロック（相対位置：バッジのため） */
+.conv-item-block {
+    position: relative;
+    min-height: 1.5em;
+    /* 高さ確保 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 商品名（長い場合は省略可） */
+.conv-item-name-large {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.3;
+    color: #000000;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: calc(100% - 48px);
+    /* バッジを避ける */
+}
+
+/* 未読バッジ */
+.badge {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    background: #FF5555;
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    line-height: 1;
+}
+
+/* ホバー／アクティブ状態（強調） */
+.conversation-list__item:hover,
+.conversation-list__item.active {
+    background-color: #F6F6F6;
+}
+
+/* レスポンシブ（狭い画面では横幅確保） */
+@media (max-width: 900px) {
+    .conversation-sidebar {
+        width: 100%;
+        align-items: stretch;
+        padding: 8px;
+    }
+
+    .conversation-list__item {
+        text-align: left;
+    }
+
+    .conv-item-block {
+        justify-content: flex-start;
+        padding-left: 12px;
+    }
+
+    .conv-item-name-large {
+        max-width: calc(100% - 56px);
+    }
+}
+
+/* --- チャットエリア --- */
+.chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ヘッダー */
+.chat-header {
+    display: flex;
+    padding: 12px 16px;
+    background: #fff;
+    border: 1px solid #eee;
+    box-sizing: border-box;
+}
+
+.chat-header__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+}
+
+.chat-meta {
+    display: flex;
+}
+
+/* プロフィールサムネイル */
+.profile-thumb {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #ddd;
+    flex-shrink: 0;
+}
+
+.profile-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 取引タイトル */
+.chat-title {
+    font-weight: 700;
+    font-size: 36px;
+}
+
+/* 完了ボタン */
+.btn-complete {
+    background-color: #FF5555;
+    color: #FFFFFF;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.btn-complete:hover {
+    opacity: 0.95;
+}
+
+/* 商品情報 */
+.item-info {
+    border-top: 2px solid #5F5F5F;
+    border-bottom: 2px solid #5F5F5F;
+}
+
+.item-brief {
+    display: flex;
+    align-items: center;
+}
+
+.item-thumb {
+    width: 200px;
+    height: 200px;
+    margin: 20px 50px;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.item-info__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.item-name {
+    font-weight: 700;
+    font-size: 48px;
+}
+
+.item-price {
+    font-size: 36px;
+}
+
+/* --- メッセージ一覧 --- */
+.messages-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+/* ----------- 調整済みメッセージ関連スタイル ----------- */
+
+/* メッセージ行は既存のまま（右寄せ / 左寄せは .message-row.mine/.theirs で） */
+.message-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* メッセージコンテナ */
+.message-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 70%;
+    box-sizing: border-box;
+}
+
+/* 自分・相手の位置（既存） */
+.message-row.mine {
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+.message-row.theirs {
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+/* ヘッダー（名前・画像） */
+.message-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+}
+
+/* --- ここを変更 --- */
+/* 自分のメッセージ：出力HTMLが "name then avatar" のため、flex-direction: row に */
+.message-header--mine {
+    flex-direction: row;
+    /* ← 以前の row-reverse を解除 */
+    justify-content: flex-end;
+    /* 右寄せ（親の配置と合わせる） */
+}
+
+/* 相手のメッセージはそのまま左並び */
+.message-header--theirs {
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.message-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.message-name {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* バブル（既存） */
+.message-content {
+    background: #D9D9D9;
+    border-radius: 4px;
+    padding: 10px 12px;
+}
+
+.message-content--mine {
+    background: #D9D9D9;
+    text-align: right;
+}
+
+.message-content--theirs {
+    background: #D9D9D9;
+    text-align: left;
+}
+
+/* 本文・画像 */
+.message-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #222;
+    font-size: 15px;
+}
+
+.message-image img {
+    display: block;
+    max-width: 240px;
+    max-height: 240px;
+    border-radius: 8px;
+    margin-top: 4px;
+}
+
+/* 編集・削除ボタンエリア */
+/* デフォルトは左寄せ、ただし自分の行は右寄せにする */
+.message-actions-row {
+    display: flex;
+    gap: 6px;
+    font-size: 12px;
+    margin-top: 4px;
+    justify-content: flex-start;
+    /* デフォルト：左 */
+    align-items: center;
+}
+
+/* 自分のメッセージならアクションを右寄せ */
+.message-row.mine .message-actions-row {
+    justify-content: flex-end;
+}
+
+/* ボタン見た目（要望どおりのグレー） */
+.link-edit,
+.link-delete {
+    background: transparent;
+    border: none;
+    color: #5F5F5F;
+    /* 指示どおり */
+    cursor: pointer;
+    text-decoration: none;
+    /* 下線は不要 */
+    padding: 0;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+/* ホバー時に軽い示唆を出す（任意） */
+.link-edit:hover,
+.link-delete:hover {
+    text-decoration: underline;
+    opacity: 0.92;
+}
+
+/* 編集フォーム */
+.edit-form textarea {
+    width: 100%;
+    min-height: 48px;
+    resize: vertical;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    padding: 6px;
+    box-sizing: border-box;
+}
+
+.edit-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.btn-save-edit,
+.btn-cancel-edit {
+    background-color: #FF5555;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 4px 8px;
+    cursor: pointer;
+}
+
+.btn-cancel-edit {
+    background-color: #ccc;
+    color: #222;
+}
+
+/* --- フッター（送信フォーム） — 置き換え用 --- */
+.chat-footer {
+    padding: 12px;
+}
+
+/* 入力行全体をセンター揃えにして高さを揃える */
+.send-form .input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    /* 垂直中央揃え */
+    justify-content: space-between;
+}
+
+/* テキストエリア：高さを 44px に固定して中央揃えに見えるように調整 */
+.send-form textarea {
+    flex: 1;
+    height: 44px;
+    /* 指定高さ */
+    min-height: 44px;
+    max-height: 160px;
+    padding: 8px 12px;
+    /* 内側余白を小さめに */
+    border: 1px solid #5F5F5F;
+    /* 指定されたボーダー色 */
+    border-radius: 8px;
+    resize: vertical;
+    font-size: 20px;
+    /* 指定フォントサイズ */
+    font-weight: 700;
+    /* 指定フォントウェイト */
+    line-height: 1.0;
+    /* 行間を詰め気味にして中央寄せに見せる */
+    box-sizing: border-box;
+    background: #fff;
+    color: #222;
+    display: flex;
+    align-items: center;
+    /* フレックスボックスで中に配置（textarea では効かないが保険） */
+}
+
+/* file input 本体は完全に隠す */
+.file-label input[type="file"],
+input[type="file"]#messageImage {
+    display: none !important;
+}
+
+/* 画像追加ラベル：テキストエリアと同じ高さに揃える */
+.file-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    /* テキストエリアと同じ高さ */
+    padding: 0 12px;
+    /* 横の余白のみ */
+    color: #FF5555;
+    border: 1px solid #FF5555;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.15s;
+    background: transparent;
+    font-weight: 700;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+/* 送信ボタン：正方形 44px、アイコンは中央に大きめで表示 */
+.btn-send {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    /* テキストエリアと揃える */
+    width: 44px;
+    /* 正方形にしてアイコンを中央表示 */
+    padding: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* 送信アイコンはボタン内で中央表示（やや大きめ） */
+.btn-send img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    display: block;
+}
+
+/* 画像プレビュー（送信行の下に表示される想定） */
+.image-preview {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.image-preview img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #e6e6e6;
+}
+
+/* モバイル：高さを自動に戻す */
+@media (max-width: 600px) {
+
+    .send-form textarea,
+    .file-label,
+    .btn-send {
+        height: auto;
+        min-height: 40px;
+    }
+
+    .send-form .input-row {
+        align-items: stretch;
+    }
+
+    .file-label {
+        padding: 10px 12px;
+    }
+
+    .btn-send {
+        width: auto;
+        padding: 8px;
+    }
+}
+
+.btn-send img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+/* 画像プレビュー：非表示がデフォルト。選択時は JS で display:block にする */
+.image-preview {
+    display: none;
+    margin-top: 8px;
+    align-items: center;
+    gap: 8px;
+}
+
+.image-preview img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid #e6e6e6;
+}
+
+/* クリアボタン */
+.clear-image-btn {
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    color: #666;
+}
+
+/* --- モーダル全体 --- */
+.modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    /* JS で display:flex にする */
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* modal-inner: 横パディングを変数で管理（content-box 使用） */
+.modal-inner {
+    --modal-pad-x: 22px;
+    width: 92%;
+    max-width: 520px;
+    border-radius: 12px;
+    padding: 18px var(--modal-pad-x);
+    box-sizing: content-box;
+    border: 1px solid #000;
+    background: #FDFCE6;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    animation: modalFadeIn 0.25s ease-out;
+    position: relative;
+    overflow: visible;
+}
+
+/* フェードイン */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* modal-block（各セクション） */
+.modal-block {
+    position: relative;
+    width: 100%;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    z-index: 1;
+}
+
+/* divider — 実体の線（モーダル内を左右いっぱいに広げる） */
+.divider {
+    position: relative;
+    left: calc(-1 * var(--modal-pad-x, 22px));
+    width: calc(100% + (var(--modal-pad-x, 22px) * 2));
+    height: 1px;
+    background: #000;
+    margin-top: 8px;
+    pointer-events: none;
+    box-sizing: content-box;
+}
+
+/* 最後のブロックに divider があれば非表示 */
+.modal-block:last-child .divider {
+    display: none;
+}
+
+/* 見出し / メッセージ */
+.modal-block h3 {
+    margin: 0 0 4px 0;
+    font-size: 34px;
+    font-weight: 700;
+}
+
+.modal-block__message {
+    color: #666;
+    font-size: 20px;
+    margin-bottom: 12px;
+}
+
+/* 星評価：塗りの★（未選択は灰の塗り、選択済みはゴールド） */
+.rating-stars-input {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 星ボタン（未選択は灰で塗りつぶし） */
+.star-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    font-size: 42px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #CFCFCF;
+    /* 未選択：灰（塗り） */
+    transition: transform .12s ease, color .12s ease, text-shadow .12s ease;
+    line-height: 1;
+    user-select: none;
+}
+
+/* hover/focus 補助 */
+.star-btn:hover,
+.star-btn:focus {
+    transform: scale(1.05);
+    outline: none;
+}
+
+/* 選択済みは色だけゴールドに（未選択星は引き続き灰で塗りのまま） */
+.star-btn.filled {
+    color: #FFF048;
+    /* ゴールド */
+    text-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+}
+
+/* モーダル内アクション（送信ボタン）を右寄せ */
+.modal-block.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 6px;
+    padding-top: 6px;
+}
+
+/* 送信ボタン（見た目） */
+#submitRating.btn-complete {
+    background-color: #FF5555;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    box-shadow: 0 6px 14px rgba(255, 85, 85, 0.12);
+}
+
+/* ホバー */
+#submitRating.btn-complete:hover,
+#submitRating.btn-complete:focus {
+    transform: translateY(-1px);
+    opacity: 0.95;
+    outline: none;
+    box-shadow: 0 10px 20px rgba(255, 85, 85, 0.18);
+}
+
+/* モバイル調整 */
+@media (max-width: 480px) {
+    .modal-inner {
+        --modal-pad-x: 16px;
+        padding: 16px var(--modal-pad-x);
+    }
+
+    .star-btn {
+        font-size: 36px;
+        padding: 8px 10px;
+    }
+
+    .divider {
+        left: calc(-1 * var(--modal-pad-x));
+        width: calc(100% + (var(--modal-pad-x) * 2));
+    }
+}
+
+/* フォーム上部のエラーエリア */
+.form-errors {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: #b71c1c;
+}
+
+/* 個別エラー */
+.form-error {
+    color: #b71c1c;
+    /* 赤文字 */
+    background: #fff1f0;
+    /* 薄い赤背景で目立たせる */
+    border: 1px solid #f5c6cb;
+    /* 薄い枠 */
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+}

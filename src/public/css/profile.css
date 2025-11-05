@@ -1,24 +1,26 @@
+/* 基本レイアウト */
 .profile-form {
     width: 100%;
+    /* 高さは画面に応じて伸びるようにする（固定はしない） */
+    padding: 24px 0;
+    box-sizing: border-box;
 }
 
+/* プロフィール上部 */
 .profile-info {
     width: 70%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 48px auto;
-
+    margin: 24px auto 40px;
+    gap: 16px;
 }
 
 /* プロフィール画像エリア */
 .profile-image__area {
-    width: 40%;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-
-    gap: 10%;
+    gap: 18px;
 }
 
 .profile-image__circle {
@@ -27,9 +29,11 @@
     border-radius: 50%;
     overflow: hidden;
     position: relative;
+    flex-shrink: 0;
+    background: #f2f2f2;
 }
 
-/* 登録済み画像のスタイル */
+/* 登録済み画像 */
 .profile-image {
     width: 100%;
     height: 100%;
@@ -37,7 +41,7 @@
     border-radius: 50%;
 }
 
-/* プロフィールが未登録の場合の灰色円 */
+/* プレースホルダ */
 .placeholder-circle {
     width: 100%;
     height: 100%;
@@ -45,7 +49,16 @@
     border-radius: 50%;
 }
 
-.btn-edit {
+/* 表示名 */
+.profile-name h2 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: #222;
+}
+
+/* 編集ボタン */
+.profile-info__link .btn-edit {
     display: inline-block;
     text-decoration: none;
     padding: 10px 15px;
@@ -53,27 +66,140 @@
     border: 1px solid #FF5555;
     cursor: pointer;
     border-radius: 5px;
-    text-align: center;
-    transition: background-color 0.3s;
+    transition: background-color 0.15s;
 }
 
+/* タブ */
 .tab-contents {
     width: 100%;
     display: flex;
     gap: 20px;
     padding: 0 100px;
-    border-bottom: 2px solid #ddd;
+    border-bottom: 2px solid #eee;
+    margin-bottom: 20px;
 }
 
 .tab-contents a {
     text-decoration: none;
-    color: #000000;
-    padding: 10px;
+    color: #000;
+    padding: 8px;
     font-weight: 700;
-    font-size: 24px;
+    font-size: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .tab-contents .active-tab {
     color: #FF0000;
 }
 
+/* タブのバッジ */
+.tab-badge {
+    display: inline-block;
+    margin-left: 8px;
+    background: #FF3B30;
+    color: white;
+    border-radius: 999px;
+    padding: 2px 8px;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+/* ===== 丸い未読バッジ（Item 用） ===== */
+.item-badge {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    background: #FF3B30;
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    /* 正円のベースサイズ */
+    height: 28px;
+    /* 正円 */
+    line-height: 1;
+    border-radius: 50%;
+    /* 完全な丸 */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+    padding: 0 6px;
+    /* 2 桁の数字のときに横を広げるための余白 */
+}
+
+/* 2桁以上のときは自動的に横幅が広がる（min-width） */
+.item-badge {
+    min-width: 28px;
+}
+
+/* 会話（取引中）用のバッジは少し違う見た目で丸寄せに */
+.message-badge {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    background: linear-gradient(180deg, #FF6B6B, #FF2D2D);
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    z-index: 10;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+    padding: 0 6px;
+    min-width: 28px;
+}
+
+/* 星表示（profile） */
+.profile-name .rating-stars {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+/* 未選択の星（mouse grey / 鼠色） */
+.profile-name .rating-stars .star,
+.profile-name .rating-stars .star:not(.filled) {
+    color: #D9D9D9;
+    font-size: 18px;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
+
+/* 選択済みの星（ゴールド） */
+.profile-name .rating-stars .star.filled {
+    color: #FFD700;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 1100px) {
+    .item-content {
+        width: calc(33.333% - 18px);
+    }
+}
+
+@media (max-width: 760px) {
+    .item-content {
+        width: calc(50% - 12px);
+    }
+}
+
+@media (max-width: 420px) {
+    .item-content {
+        width: 100%;
+    }
+
+    .tab-contents {
+        padding: 0 16px;
+        gap: 12px;
+    }
+}

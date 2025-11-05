@@ -35,7 +35,7 @@ class ItemsTableSeeder extends Seeder
                 'image' => 'images/HDD+Hard+Disk.jpg',
             ],
             [
-                'user_id' => '2',
+                'user_id' => '1',
                 'condition_id' => '3',
                 'name' => '玉ねぎ3束',
                 'brand' => 'mogitate',
@@ -44,7 +44,7 @@ class ItemsTableSeeder extends Seeder
                 'image' => 'images/iLoveIMG+d.jpg',
             ],
             [
-                'user_id' => '2',
+                'user_id' => '1',
                 'condition_id' => '4',
                 'name' => '革靴',
                 'brand' => 'John Lobb',
@@ -53,7 +53,7 @@ class ItemsTableSeeder extends Seeder
                 'image' => 'images/Leather+Shoes+Product+Photo.jpg',
             ],
             [
-                'user_id' => '3',
+                'user_id' => '1',
                 'condition_id' => '1',
                 'name' => 'ノートPC',
                 'brand' => 'Apple',
@@ -62,7 +62,7 @@ class ItemsTableSeeder extends Seeder
                 'image' => 'images/Living+Room+Laptop.jpg',
             ],
             [
-                'user_id' => '3',
+                'user_id' => '2',
                 'condition_id' => '2',
                 'name' => 'マイク',
                 'brand' => 'Panasonic',
@@ -71,7 +71,7 @@ class ItemsTableSeeder extends Seeder
                 'image' => 'images/Music+Mic+4632231.jpg',
             ],
             [
-                'user_id' => '4',
+                'user_id' => '2',
                 'condition_id' => '3',
                 'name' => 'ショルダーバック',
                 'brand' => 'エルメス',
@@ -80,7 +80,7 @@ class ItemsTableSeeder extends Seeder
                 'image' => 'images/Purse+fashion+pocket.jpg',
             ],
             [
-                'user_id' => '4',
+                'user_id' => '2',
                 'condition_id' => '4',
                 'name' => 'タンブラー',
                 'brand' => '39ショップ',
@@ -89,7 +89,7 @@ class ItemsTableSeeder extends Seeder
                 'image' => 'images/Tumbler+souvenir.jpg',
             ],
             [
-                'user_id' => '5',
+                'user_id' => '2',
                 'condition_id' => '1',
                 'name' => 'コーヒーミル',
                 'brand' => '39ショップ',
@@ -98,7 +98,7 @@ class ItemsTableSeeder extends Seeder
                 'image' => 'images/Waitress+with+Coffee+Grinder.jpg',
             ],
             [
-                'user_id' => '5',
+                'user_id' => '2',
                 'condition_id' => '2',
                 'name' => 'メイクセット',
                 'brand' => '39ショップ',

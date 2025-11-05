@@ -20,6 +20,13 @@ class DatabaseSeeder extends Seeder
             CategoriesTableSeeder::class,
             ItemsTableSeeder::class,
             CategoryItemTableSeeder::class,
-        ]);
+            OrdersTableSeeder::class,
+            CommentsTableSeeder::class,
+            FavoritesTableSeeder::class,
+            ConversationsTableSeeder::class,
+            MessagesTableSeeder::class,
+            MessageReadsTableSeeder::class,
+            RatingsTableSeeder::class,
+            ]);
     }
 }

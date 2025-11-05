@@ -11,9 +11,9 @@ class Profile extends Model
 
     protected $fillable = ['user_id', 'display_name', 'post_code', 'address', 'building', 'image'];
 
-        // ユーザーとのリレーション（BelongsTo）
-        public function user(): BelongsTo
-        {
-            return $this->belongsTo(User::class);
-        }
+    // ユーザーとのリレーション（BelongsTo）
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

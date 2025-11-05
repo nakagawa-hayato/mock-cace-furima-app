@@ -11,8 +11,8 @@ class Condition extends Model
 
     protected $fillable = ['condition']; // 必要に応じて
 
-        public function items()
-        {
-            return $this->hasMany(Item::class);
-        }
+    public function items()
+    {
+        return $this->hasMany(Item::class);
+    }
 }

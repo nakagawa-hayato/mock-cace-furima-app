@@ -6,36 +6,29 @@ use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\RegisteredUserController;
+use App\Http\Controllers\ConversationController;
+use App\Http\Controllers\MessageController;
+use App\Http\Controllers\RatingController;
+use App\Http\Controllers\StripeWebhookController;
 use App\Http\Requests\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
-
-
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
 */
 
-//  未認証でもアクセス可能なページ
-Route::get('/', [ItemController::class, 'index']);
+Route::get('/', [ItemController::class, 'index'])->name('index');
 Route::get('/item/{item_id}', [ItemController::class, 'show'])->name('item.detail');
 
-//  ログイン後にしかアクセスできないページ
 Route::middleware('auth', 'verified')->group(function () {
     Route::get('/sell', [ItemController::class, 'add']);
     Route::post('/sell', [ItemController::class, 'store']);
 
-    //購入フロー
     Route::get('/purchase/{item_id}', [PurchaseController::class, 'index'])->middleware('purchase')->name('purchase.index');
     Route::post('/purchase/{item_id}', [PurchaseController::class, 'purchase'])->middleware('purchase')->name('purchase.process');
     Route::get('/purchase/address/{item_id}', [PurchaseController::class, 'edit'])->name('purchase.address.edit');
@@ -54,8 +47,24 @@ Route::middleware('auth', 'verified')->group(function () {
     Route::post('/favorite/{item_id}', [FavoriteController::class, 'store']);
     Route::delete('/favorite/{item_id}', [FavoriteController::class, 'destroy']);
     Route::post('/comment', [CommentController::class, 'store']);
-});
 
+    // show chat
+    Route::get('/conversations/{conversation}', [ConversationController::class,'show'])->name('conversations.show');
+
+    // message actions
+    Route::post('/conversations/{conversation}/messages', [MessageController::class,'store'])->name('messages.store');
+    Route::put('/messages/{message}', [MessageController::class,'update'])->name('messages.update');
+    Route::delete('/messages/{message}', [MessageController::class,'destroy'])->name('messages.destroy');
+
+    // optional: server-side safe-complete (backup)
+    Route::post('/conversations/{conversation}/complete', [ConversationController::class, 'complete'])->name('conversations.complete');
+
+    // mark as read (ajax)
+    Route::post('/messages/{message}/read', [MessageController::class,'markRead'])->name('messages.read');
+
+    // 評価登録
+    Route::post('/items/{item}/ratings', [RatingController::class, 'store'])->name('ratings.store');
+});
 
 Route::post('login', [AuthenticatedSessionController::class, 'store'])->middleware('email');
 Route::post('/register', [RegisteredUserController::class, 'store']);
@@ -65,11 +74,9 @@ Route::get('/email/verify', function () {
 })->name('verification.notice');
 
 Route::post('/email/verification-notification', function (Request $request) {
-    // 優先: 現在ログインしているユーザー
     $user = $request->user();
 
     if (! $user) {
-        // 互換: セッションに保存された user OR id を確認
         $sessionUser = session('unauthenticated_user');
         $sessionUserId = session('unauthenticated_user_id');
 
