@@ -16,6 +16,13 @@ class RatingController extends Controller
     /**
      * 評価の保存（AJAX）
      * POST /items/{item}/ratings
+     *
+     * ロジック:
+     * - rating レコードは常に保存する
+     * - conversation_id が渡されていればそれを使い、なければ item + 参加者から探索する
+     * - conversation が見つかれば:
+     *     - rater が seller の場合 -> conversation->markRated(true) を呼ぶ（is_rated = true, also mark completed）
+     *     - rater が buyer の場合  -> conversation の is_rated は変更しない（既存ロジックに合わせる）
      */
     public function store(Request $request, Item $item)
     {
@@ -38,7 +45,7 @@ class RatingController extends Controller
 
         DB::beginTransaction();
         try {
-            // 評価を保存
+            // 1) 評価レコードを保存（comment カラムは無い）
             $rating = Rating::create([
                 'rated_user_id' => $data['rated_user_id'],
                 'rater_user_id' => $user->id,
@@ -46,35 +53,52 @@ class RatingController extends Controller
                 'score' => $data['score'],
             ]);
 
-            // 該当の conversation を特定する
+            // 2) 会話を特定
             $conversation = null;
-            if (!empty($data['conversation_id'])) {
+            if (! empty($data['conversation_id'])) {
                 $conversation = Conversation::find($data['conversation_id']);
             }
 
             if (! $conversation) {
-                // item_id と参加者情報から可能な限り一意に検索
                 $conversation = Conversation::where('item_id', $item->id)
                     ->where(function ($q) use ($user, $data) {
+                        // rater が参加しているか、rated_user が参加している会話を探す
                         $q->where(function ($q2) use ($user) {
-                            $q2->where('seller_id', $user->id)->orWhere('buyer_id', $user->id);
+                            $q2->where('seller_id', $user->id)
+                               ->orWhere('buyer_id', $user->id);
                         })
                         ->orWhere(function ($q3) use ($data) {
-                            $q3->where('seller_id', $data['rated_user_id'])->orWhere('buyer_id', $data['rated_user_id']);
+                            $q3->where('seller_id', $data['rated_user_id'])
+                               ->orWhere('buyer_id', $data['rated_user_id']);
                         });
                     })
                     ->orderByDesc('updated_at')
                     ->first();
             }
 
+            // 3) 見つかったら、役割に応じて conversation フラグを更新
             if ($conversation) {
-                // 安全策：出品者が評価を送るケースは「取引を消したい（ユーザ要求）」ことが多いため、
-                // is_rated を true にし、必要なら is_completed も true にする。
-                // ここでは常に is_rated を true にする。
-                // さらに、取引が未完了の場合、評価によって完了扱いにしたいなら第2引数 true にする。
-                // 実務では「購入者が完了ボタンを押す」流れが正しいが、要望に合わせて alsoMarkCompleted を true にします。
-                $alsoMarkCompleted = true;
-                $conversation->markRated($alsoMarkCompleted);
+                // rater が出品者（seller）の場合のみ is_rated を立てる（ProfileController のクエリ前提）
+                if ($conversation->seller_id === $user->id) {
+                    // alsoMarkCompleted: true にするかは設計判断ですが
+                    // 「出品者が評価したら会話を完了扱いにする」要望なので true にしておく
+                    $conversation->markRated(true);
+                } else {
+                    // rater が購入者（buyer）だった場合は、既に購入者側の「取引完了」アクションが先にあるはずなので
+                    // ここでは is_rated を触らず、冪等にしておく（ログだけ出す）
+                    \Log::info('RatingController: buyer submitted rating (conversation unchanged)', [
+                        'conversation_id' => $conversation->id,
+                        'rater_user_id' => $user->id,
+                    ]);
+                }
+            } else {
+                // conversation が見つからない場合はログを残して進める（後で手動で調査可能）
+                \Log::warning('RatingController: conversation not found when saving rating', [
+                    'item_id' => $item->id,
+                    'rater_user_id' => $user->id,
+                    'rated_user_id' => $data['rated_user_id'],
+                    'payload' => $data,
+                ]);
             }
 
             DB::commit();
