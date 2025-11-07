@@ -17,7 +17,6 @@ class RatingRequest extends FormRequest
             'item_id' => ['required','integer','exists:items,id'],
             'rated_user_id' => ['required','integer','exists:users,id'],
             'score' => ['required','integer','between:1,5'],
-            'comment' => ['nullable','string','max:1000'],
         ];
     }
 

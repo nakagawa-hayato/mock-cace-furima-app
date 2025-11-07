@@ -140,41 +140,21 @@
             <form id="messageForm" action="{{ route('messages.store', ['conversation' => $conversation->id]) }}" method="POST" enctype="multipart/form-data" class="send-form" novalidate>
                 @csrf
 
-                {{-- エラー表示（入力欄の上） --}}
-                @if($errors->any())
-                <div class="form-errors" role="alert" aria-live="polite">
-                    {{-- body のエラーを優先表示 --}}
-                    @if($errors->has('body'))
-                        <div class="form-error">{{ $errors->first('body') }}</div>
-                    @endif
+                {{-- Blade 側での個別フィールドエラー（保険として残す） --}}
+                @error('body')
+                    <p class="form-error-inline" data-field="body">{{ $message }}</p>
+                @enderror
 
-                    {{-- image のエラー --}}
-                    @if($errors->has('image'))
-                        <div class="form-error">{{ $errors->first('image') }}</div>
-                    @endif
-
-                    {{-- その他のフィールド別エラー（body,image を除外して表示） --}}
-                    @php
-                        $skip = ['body','image'];
-                        $messagesByField = $errors->getMessages(); // field => [msg1, msg2, ...]
-                    @endphp
-
-                    @foreach ($messagesByField as $field => $msgs)
-                        @if (! in_array($field, $skip))
-                            @foreach ($msgs as $msg)
-                                <div class="form-error">{{ $msg }}</div>
-                            @endforeach
-                        @endif
-                    @endforeach
-                </div>
-            @endif
+                @error('image')
+                    <p class="form-error-inline" data-field="image">{{ $message }}</p>
+                @enderror
 
                 <div class="input-row">
                     <textarea name="body" id="messageBody" placeholder="取引メッセージを記入してください" maxlength="400" required>{{ old('body', '') }}</textarea>
 
                     <div class="controls">
                         <label for="messageImage" class="file-label" title="画像を追加">画像を追加</label>
-                        <input type="file" name="image" id="messageImage" accept="image/png,image/jpeg" style="display:none;" />
+                        <input type="file" name="image" id="messageImage" style="display:none;" />
 
                         <button type="submit" class="btn-send" aria-label="送信">
                             <img src="{{ asset('storage/images/sent.jpg') }}" alt="送信">
@@ -239,36 +219,140 @@ document.addEventListener('DOMContentLoaded', function () {
         wrapper.scrollTop = wrapper.scrollHeight;
     }
 
+    /* -------------------------
+       サーバ側エラーを Blade から受け取る
+       Object: { fieldName: [msg1, msg2, ...], ... }
+       ------------------------- */
+    window.serverErrors = {!! json_encode($errors->messages(), JSON_UNESCAPED_UNICODE) !!} || {};
+
+    // helper: 表示用のエラー要素を作る（field に紐づく）
+    function showFormError(field, message) {
+        // field に対応する既存要素があれば更新
+        let existing = document.querySelector('.form-error-inline[data-field="' + field + '"]');
+        if (!existing) {
+            existing = document.createElement('div');
+            existing.className = 'form-error-inline';
+            existing.setAttribute('data-field', field);
+            existing.setAttribute('role', 'alert');
+            // 挿入位置：フォーム内の .input-row の前（入力欄の上）
+            const form = document.getElementById('messageForm');
+            const inputRow = form ? form.querySelector('.input-row') : null;
+            if (form && inputRow) {
+                form.insertBefore(existing, inputRow);
+            } else if (form) {
+                form.insertBefore(existing, form.firstChild);
+            } else {
+                // 最終手段：body の先頭
+                document.body.insertBefore(existing, document.body.firstChild);
+            }
+        }
+        existing.textContent = message;
+    }
+
+    function clearFormError(field) {
+        if (field) {
+            const el = document.querySelector('.form-error-inline[data-field="' + field + '"]');
+            if (el) el.remove();
+            return;
+        }
+        // 全削除
+        document.querySelectorAll('.form-error-inline').forEach(el => el.remove());
+    }
+
+    // 初期ロード時にサーバエラーがあれば優先表示
+    (function applyServerErrors() {
+        try {
+            // 優先順: body -> image -> first available
+            if (window.serverErrors && typeof window.serverErrors === 'object') {
+                if (Array.isArray(window.serverErrors.body) && window.serverErrors.body.length > 0) {
+                    showFormError('body', window.serverErrors.body[0]);
+                    return;
+                }
+                if (Array.isArray(window.serverErrors.image) && window.serverErrors.image.length > 0) {
+                    showFormError('image', window.serverErrors.image[0]);
+                    return;
+                }
+                // その他があれば最初のフィールドの最初のメッセージを表示
+                for (const f in window.serverErrors) {
+                    if (Array.isArray(window.serverErrors[f]) && window.serverErrors[f].length > 0) {
+                        showFormError(f, window.serverErrors[f][0]);
+                        return;
+                    }
+                }
+            }
+        } catch (e) {
+            // ignore
+            console.warn('applyServerErrors failed', e);
+        }
+    })();
+
+    /* -------------------------
+       画像 input の change ハンドラ（クライアント検証 + プレビュー）
+       - accept 属性を外しているため利用者は任意のファイルを選べます。
+       - JS で jpg/png（image/jpeg, image/png）以外は弾き、エラー表示します。
+       ------------------------- */
     if (imageInput) {
         imageInput.addEventListener('change', function (e) {
             const file = e.target.files && e.target.files[0];
+
+            // まず既存の image エラーを消す
+            clearFormError('image');
+
             if (!file) {
                 if (imagePreview) imagePreview.style.display = 'none';
                 return;
             }
+
+            // クライアント側検証ルール（変更可）
             const allowed = ['image/png', 'image/jpeg'];
-            if (!allowed.includes(file.type)) {
-                alert('画像は .png または .jpeg のみ対応しています。');
+            const maxBytes = 2 * 1024 * 1024; // 2MB 上限（必要に応じて調整）
+
+            // MIME タイプがない場合（古いブラウザや一部ファイル）は拡張子で判定（後方互換）
+            let fileType = file.type && file.type.toLowerCase();
+            if (!fileType && file.name) {
+                const ext = file.name.split('.').pop().toLowerCase();
+                if (ext === 'jpg' || ext === 'jpeg') fileType = 'image/jpeg';
+                else if (ext === 'png') fileType = 'image/png';
+            }
+
+            if (!allowed.includes(fileType)) {
+                showFormError('image', '画像は .png または .jpg/.jpeg のみ対応しています。');
                 imageInput.value = '';
                 if (imagePreview) imagePreview.style.display = 'none';
                 return;
             }
+
+            if (file.size && file.size > maxBytes) {
+                showFormError('image', '画像は2MB以下でアップロードしてください。');
+                imageInput.value = '';
+                if (imagePreview) imagePreview.style.display = 'none';
+                return;
+            }
+
+            // プレビュー表示
             const reader = new FileReader();
             reader.onload = function (ev) {
                 if (previewImg) previewImg.src = ev.target.result;
                 if (imagePreview) imagePreview.style.display = 'flex';
+                // 成功したら該当エラーを消す
+                clearFormError('image');
             };
             reader.readAsDataURL(file);
         });
     }
+
     if (clearBtn) {
         clearBtn.addEventListener('click', function () {
             if (imageInput) imageInput.value = '';
             if (previewImg) previewImg.src = '';
             if (imagePreview) imagePreview.style.display = 'none';
+            clearFormError('image');
         });
     }
 
+    /* -------------------------
+       星評価モーダル関連（既存）
+       ------------------------- */
     function setStars(n) {
         const num = parseInt(n || 0, 10);
         stars.forEach(s => {
@@ -310,6 +394,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    /* -------------------------
+       完了・評価送信（既存 fetch 呼び出しをそのまま使用）
+       ------------------------- */
     if (openBtn) {
         openBtn.addEventListener('click', function () {
             if (openBtn.disabled) return;
@@ -421,6 +508,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    /* 編集行の toggle / cancel */
     document.querySelectorAll('.link-edit').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.dataset.messageId;

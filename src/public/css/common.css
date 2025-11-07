@@ -1,8 +1,16 @@
-
 html,
 body {
     width: 100%;
     height: 100vh;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: inherit;
 }
 
 textarea::placeholder,
@@ -11,12 +19,13 @@ input::placeholder {
 }
 
 .app {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-/* ヘッダー */
+/* ヘッダー
+   構造は変えずにレスポンシブで収める調整を行う */
 .header {
     display: grid;
     align-items: center;
@@ -33,9 +42,155 @@ input::placeholder {
     gap: 6%;
 }
 
+/* ヘッダー左（ロゴ等） */
 .header__heading {
     grid-column: 1;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 700;
+    white-space: nowrap;
 }
+
+/* ヘッダー右ナビ（ログアウト / マイページ / 出品 等） */
+.header__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    gap: 5%;
+
+    grid-column: 3;
+    /* 折り返しを防ぎ、横に詰めて表示させる */
+    white-space: nowrap;
+}
+
+/* ナビ内の要素（リンク・ボタン） */
+.header__item,
+.header-nav__button,
+.mypage,
+.sell,
+.login {
+    font-size: 18px;
+    color: #FFFFFF;
+    text-decoration: none;
+    white-space: nowrap;
+    /* 個別にも設定 */
+}
+
+/* 特殊ボタン見た目 */
+.header-nav__button {
+    color: #FFFFFF;
+    background-color: #000000;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* 出品ボタン */
+.sell {
+    color: #000000;
+    background: #FFFFFF;
+    margin: 0 auto;
+    padding: 6px 18px;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+@media (max-width: 1200px) {
+    .header {
+        gap: 5%;
+    }
+
+    .header__heading {
+        font-size: 18px;
+    }
+
+    .header__item,
+    .header-nav__button,
+    .mypage,
+    .sell,
+    .login {
+        font-size: 16px;
+    }
+
+    .header__nav {
+        gap: 4%;
+    }
+}
+
+@media (max-width: 1024px) {
+
+    .header__heading {
+        font-size: 16px;
+    }
+
+    .header__item,
+    .header-nav__button,
+    .mypage,
+    .sell,
+    .login {
+        font-size: 15px;
+    }
+
+    .header__nav {
+        gap: 3%;
+    }
+}
+
+@media (max-width: 768px) {
+
+    /* 狭いタブレット / 大きめスマホ */
+    .header {
+        padding: 12px;
+        height: 72px;
+    }
+
+    .header__heading {
+        font-size: 15px;
+    }
+
+    .header__item,
+    .header-nav__button,
+    .mypage,
+    .sell,
+    .login {
+        font-size: 14px;
+    }
+
+    .header__nav {
+        gap: 2%;
+        justify-content: flex-end;
+    }
+}
+
+/* 更に狭い場合は最終調整（スマホ） */
+@media (max-width: 520px) {
+
+    .keyword,
+    .search-button {
+        height: 44px;
+    }
+
+    .header__heading {
+        font-size: 14px;
+    }
+
+    .header__item,
+    .header-nav__button,
+    .mypage,
+    .sell,
+    .login {
+        font-size: 13px;
+    }
+
+    .header__nav {
+        gap: 6px;
+    }
+}
+
+/* ===========================
+   search form styles
+   =========================== */
 
 /* ラッパー */
 .search-wrapper {
@@ -47,13 +202,11 @@ input::placeholder {
 .search-form {
     display: flex;
     align-items: stretch;
-    /* 重要：子要素を親の高さに合わせる */
 }
 
 /* 入力枠を左側で伸ばす */
 .search-box {
     flex: 1;
-    /* 残り幅を全て使う */
     display: block;
 }
 
@@ -61,154 +214,44 @@ input::placeholder {
 .keyword {
     width: 100%;
     height: 48px;
-    /* ここで高さを指定するとボタンと揃う */
     padding: 12px 16px;
     font-size: 16px;
     border: 1px solid #D9C6B5;
-    /* 外側の枠線 */
     border-right: none;
-    /* 右側のボーダーは消す（ボタンと繋がる見た目）*/
     border-radius: 8px 0 0 8px;
-    /* 左側だけ角丸 */
     background: #FFFFFF;
     outline: none;
     box-sizing: border-box;
 }
 
-/* ボタン（入力枠の外側・正方形）*/
+/* ボタン */
 .search-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 48px;
-    /* 正方形の幅 */
     min-width: 48px;
-    /* 固定 */
     height: 48px;
-    /* 入力欄と同じ高さに */
     border: 1px solid #D9C6B5;
     border-left: none;
-    /* 左のボーダーを消して繋がる見た目 */
     border-radius: 0 8px 8px 0;
-    /* 右側だけ角丸 */
     background: #000000;
-    /* ボタン背景（好みで変更可） */
     color: #ffffff;
     cursor: pointer;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* ボタン内アイコン */
 .search-button img {
     width: 22px;
-    /* アイコンサイズ */
     height: auto;
     display: block;
 }
 
-/* フォーカス時の見た目（アクセシビリティ向上） */
 .keyword:focus,
 .search-button:focus {
     outline: 2px solid rgba(0, 0, 0, 0.08);
     outline-offset: 0;
-}
-
-/* モバイル微調整 */
-@media (max-width: 520px) {
-
-    .keyword,
-    .search-button {
-        height: 44px;
-    }
-
-    .search-button {
-        width: 44px;
-        min-width: 44px;
-    }
-
-    .keyword {
-        padding: 10px 12px;
-        font-size: 14px;
-    }
-}
-
-.header__nav {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-    gap: 5%;
-
-    grid-column: 3;
-}
-
-.header__item {
-    font-size: 18px;
-}
-
-.header-nav__button {
-    color:#FFFFFF;
-    background-color: #000000;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-.mypage {
-    color: #FFFFFF;
-    text-decoration: none;
-}
-
-.sell {
-    color: #000000;
-    background: #FFFFFF;
-    margin: 0 auto;
-    padding: 6px 18px;
-    border-radius: 4px;
-    text-decoration: none;
-}
-
-.login {
-    color: #FFFFFF;
-    text-decoration: none;
-}
-
-/* コンテンツ */
-.content {
-    display: flex;
-    flex-direction: column;
-    flex-grow: 1;
-    justify-content: center;
-    width: 100%;
-    min-height: calc(100vh - 80px);
-}
-
-.content__heading {
-    text-align: center;
-    font-weight: 700;
-    font-size: 36px;
-}
-
-@media screen and (max-width: 1200px) {
-    .form-container,
-    .login-form__form,
-    .register-form__form,
-    .sell-form__form,
-    .edit-form__form {
-        width: 60vw;
-    }
-}
-
-@media screen and (max-width: 768px) {
-    .form-container,
-    .login-form__form,
-    .register-form__form,
-    .sell-form__form,
-    .edit-form__form {
-        width: 90vw;
-        padding: 48px 24px;
-    }
 }
 
 .btn {
@@ -226,4 +269,43 @@ input::placeholder {
 
 .btn:hover {
     background-color: #B3A69D;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: center;
+    width: 100%;
+    min-height: calc(100vh - 80px);
+}
+
+.content__heading {
+    text-align: center;
+    font-weight: 700;
+    font-size: 36px;
+}
+
+/* responsive form container widths */
+@media screen and (max-width: 1200px) {
+
+    .form-container,
+    .login-form__form,
+    .register-form__form,
+    .sell-form__form,
+    .edit-form__form {
+        width: 60vw;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    .form-container,
+    .login-form__form,
+    .register-form__form,
+    .sell-form__form,
+    .edit-form__form {
+        width: 90vw;
+        padding: 48px 24px;
+    }
 }

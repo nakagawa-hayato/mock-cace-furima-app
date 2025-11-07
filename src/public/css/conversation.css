@@ -1,4 +1,6 @@
-/* --- 全体ラッパー --- */
+/* conversation.css - full file */
+
+/* 全体ラッパー */
 .conversation-page,
 .conversation-form {
     display: flex;
@@ -14,12 +16,9 @@
     width: 260px;
     box-sizing: border-box;
     background-color: #868686;
-    /* 元の色 */
     padding: 16px 28px;
-    /* 余白を確保 */
 }
 
-/* 見出し */
 .conversation-sidebar__heading {
     color: #FFFFFF;
     font-size: 30px;
@@ -28,7 +27,6 @@
     line-height: 1;
 }
 
-/* リスト本体 */
 .conversation-list {
     list-style: none;
     padding: 0;
@@ -36,17 +34,14 @@
     width: 100%;
 }
 
-/* 各アイテム */
 .conversation-list__item {
     background-color: #EEEFEB;
-    /* 元の背景 */
     margin-bottom: 32px;
     border-radius: 5px;
     text-align: center;
     transition: background-color .12s ease;
 }
 
-/* リンク全体をブロック化 */
 .conversation-list__item .conversation-link {
     display: block;
     padding: 10px;
@@ -54,17 +49,14 @@
     color: inherit;
 }
 
-/* アイテム内のブロック（相対位置：バッジのため） */
 .conv-item-block {
     position: relative;
     min-height: 1.5em;
-    /* 高さ確保 */
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* 商品名（長い場合は省略可） */
 .conv-item-name-large {
     font-weight: 700;
     font-size: 24px;
@@ -74,10 +66,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: calc(100% - 48px);
-    /* バッジを避ける */
 }
 
-/* 未読バッジ */
 .badge {
     position: absolute;
     right: 8px;
@@ -91,13 +81,11 @@
     line-height: 1;
 }
 
-/* ホバー／アクティブ状態（強調） */
 .conversation-list__item:hover,
 .conversation-list__item.active {
     background-color: #F6F6F6;
 }
 
-/* レスポンシブ（狭い画面では横幅確保） */
 @media (max-width: 900px) {
     .conversation-sidebar {
         width: 100%;
@@ -126,7 +114,6 @@
     flex-direction: column;
 }
 
-/* ヘッダー */
 .chat-header {
     display: flex;
     padding: 12px 16px;
@@ -147,7 +134,6 @@
     display: flex;
 }
 
-/* プロフィールサムネイル */
 .profile-thumb {
     width: 56px;
     height: 56px;
@@ -163,13 +149,11 @@
     object-fit: cover;
 }
 
-/* 取引タイトル */
 .chat-title {
     font-weight: 700;
     font-size: 36px;
 }
 
-/* 完了ボタン */
 .btn-complete {
     background-color: #FF5555;
     color: #FFFFFF;
@@ -226,16 +210,13 @@
     padding: 16px;
 }
 
-/* ----------- 調整済みメッセージ関連スタイル ----------- */
-
-/* メッセージ行は既存のまま（右寄せ / 左寄せは .message-row.mine/.theirs で） */
+/* メッセージ行 */
 .message-row {
     display: flex;
     gap: 12px;
     margin-bottom: 12px;
 }
 
-/* メッセージコンテナ */
 .message-container {
     display: flex;
     flex-direction: column;
@@ -243,7 +224,6 @@
     box-sizing: border-box;
 }
 
-/* 自分・相手の位置（既存） */
 .message-row.mine {
     justify-content: flex-end;
     align-items: flex-end;
@@ -254,7 +234,6 @@
     align-items: flex-start;
 }
 
-/* ヘッダー（名前・画像） */
 .message-header {
     display: flex;
     align-items: center;
@@ -262,16 +241,12 @@
     margin-bottom: 4px;
 }
 
-/* --- ここを変更 --- */
-/* 自分のメッセージ：出力HTMLが "name then avatar" のため、flex-direction: row に */
+/* 自分の行は "name then avatar" に合わせる */
 .message-header--mine {
     flex-direction: row;
-    /* ← 以前の row-reverse を解除 */
     justify-content: flex-end;
-    /* 右寄せ（親の配置と合わせる） */
 }
 
-/* 相手のメッセージはそのまま左並び */
 .message-header--theirs {
     flex-direction: row;
     justify-content: flex-start;
@@ -296,7 +271,7 @@
     font-weight: 600;
 }
 
-/* バブル（既存） */
+/* バブル */
 .message-content {
     background: #D9D9D9;
     border-radius: 4px;
@@ -313,7 +288,6 @@
     text-align: left;
 }
 
-/* 本文・画像 */
 .message-text {
     white-space: pre-wrap;
     word-break: break-word;
@@ -329,39 +303,32 @@
     margin-top: 4px;
 }
 
-/* 編集・削除ボタンエリア */
-/* デフォルトは左寄せ、ただし自分の行は右寄せにする */
+/* 編集・削除ボタン */
 .message-actions-row {
     display: flex;
     gap: 6px;
     font-size: 12px;
     margin-top: 4px;
     justify-content: flex-start;
-    /* デフォルト：左 */
     align-items: center;
 }
 
-/* 自分のメッセージならアクションを右寄せ */
 .message-row.mine .message-actions-row {
     justify-content: flex-end;
 }
 
-/* ボタン見た目（要望どおりのグレー） */
 .link-edit,
 .link-delete {
     background: transparent;
     border: none;
     color: #5F5F5F;
-    /* 指示どおり */
     cursor: pointer;
     text-decoration: none;
-    /* 下線は不要 */
     padding: 0;
     font-weight: 600;
     font-size: 13px;
 }
 
-/* ホバー時に軽い示唆を出す（任意） */
 .link-edit:hover,
 .link-delete:hover {
     text-decoration: underline;
@@ -400,114 +367,181 @@
     color: #222;
 }
 
-/* --- フッター（送信フォーム） — 置き換え用 --- */
+/* --- フッター（送信フォーム） --- */
+.form-errors {
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    color: #b71c1c;
+}
+
+.form-error {
+    color: #b71c1c;
+    background: #fff1f0;
+    border: 1px solid #f5c6cb;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+/* シンプル一行エラー */
+.form-error-simple,
+.form-error-inline {
+    color: #b71c1c;
+    font-weight: 700;
+    margin: 6px 0 10px 0;
+    font-size: 14px;
+    line-height: 1.2;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+/* 互換用 */
+.form-error-inline {
+    color: #b71c1c;
+    font-weight: 700;
+    margin: 6px 0 10px 0;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+/* controls wrapper */
+.controls {
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+}
+
+/* file-label */
+.controls .file-label {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #FF5555;
+    background: transparent;
+    color: #FF5555;
+    font-weight: 700;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+/* controls 内 btn-send 保険 */
+.controls .btn-send {
+    height: 44px;
+    width: 44px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* アイテム画像ラッパー / バッジ */
+.item-img-wrap {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.item-img {
+    max-width: 100%;
+    max-height: 140px;
+    object-fit: cover;
+    display: block;
+    border-radius: 6px;
+}
+
+.message-badge,
+.item-badge {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    background: #FF5555;
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    line-height: 1;
+    z-index: 5;
+}
+
+/* チャットフッター */
 .chat-footer {
     padding: 12px;
 }
 
-/* 入力行全体をセンター揃えにして高さを揃える */
+/* ----- 送信行（テキストエリア + 画像ラベル + 送信ボタン）を中央揃えに ----- */
 .send-form .input-row {
     display: flex;
     gap: 8px;
     align-items: center;
-    /* 垂直中央揃え */
     justify-content: space-between;
 }
 
-/* テキストエリア：高さを 44px に固定して中央揃えに見えるように調整 */
+/* テキストエリア調整 */
 .send-form textarea {
     flex: 1;
     height: 44px;
-    /* 指定高さ */
     min-height: 44px;
     max-height: 160px;
-    padding: 8px 12px;
-    /* 内側余白を小さめに */
-    border: 1px solid #5F5F5F;
-    /* 指定されたボーダー色 */
-    border-radius: 8px;
-    resize: vertical;
-    font-size: 20px;
-    /* 指定フォントサイズ */
+    padding: 6px 12px;
+    font-size: 16px;
     font-weight: 700;
-    /* 指定フォントウェイト */
-    line-height: 1.0;
-    /* 行間を詰め気味にして中央寄せに見せる */
+    line-height: 1.1;
     box-sizing: border-box;
-    background: #fff;
-    color: #222;
-    display: flex;
-    align-items: center;
-    /* フレックスボックスで中に配置（textarea では効かないが保険） */
+    display: block;
+    align-self: center;
 }
 
-/* file input 本体は完全に隠す */
-.file-label input[type="file"],
-input[type="file"]#messageImage {
-    display: none !important;
-}
-
-/* 画像追加ラベル：テキストエリアと同じ高さに揃える */
-.file-label {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 44px;
-    /* テキストエリアと同じ高さ */
-    padding: 0 12px;
-    /* 横の余白のみ */
-    color: #FF5555;
-    border: 1px solid #FF5555;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: background-color 0.15s;
-    background: transparent;
-    font-weight: 700;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-/* 送信ボタン：正方形 44px、アイコンは中央に大きめで表示 */
+/* 画像追加ラベル・送信ボタンの高さ合わせ */
+.file-label,
 .btn-send {
+    height: 44px;
+    min-height: 44px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 44px;
-    /* テキストエリアと揃える */
+    box-sizing: border-box;
+}
+
+/* 送信ボタン: 画像のみ表示にする設定（重要） */
+.btn-send {
     width: 44px;
-    /* 正方形にしてアイコンを中央表示 */
+    /* 正方形 */
     padding: 0;
     background: transparent;
     border: none;
     cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     box-sizing: border-box;
+    font-size: 0;
+    /* テキストが入っていても見えなくする */
+    line-height: 0;
+    color: transparent;
+    /* 念のためテキスト非表示 */
 }
 
-/* 送信アイコンはボタン内で中央表示（やや大きめ） */
+/* アイコンのサイズ（ボタン内） */
 .btn-send img {
-    width: 22px;
-    height: 22px;
+    width: 36px;
+    height: 36px;
     object-fit: contain;
     display: block;
 }
 
-/* 画像プレビュー（送信行の下に表示される想定） */
-.image-preview {
-    margin-top: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.image-preview img {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 6px;
-    border: 1px solid #e6e6e6;
-}
-
-/* モバイル：高さを自動に戻す */
+/* 小画面調整 */
 @media (max-width: 600px) {
 
     .send-form textarea,
@@ -515,32 +549,18 @@ input[type="file"]#messageImage {
     .btn-send {
         height: auto;
         min-height: 40px;
+        align-self: stretch;
     }
 
     .send-form .input-row {
         align-items: stretch;
     }
-
-    .file-label {
-        padding: 10px 12px;
-    }
-
-    .btn-send {
-        width: auto;
-        padding: 8px;
-    }
 }
 
-.btn-send img {
-    width: 36px;
-    height: 36px;
-    object-fit: contain;
-}
-
-/* 画像プレビュー：非表示がデフォルト。選択時は JS で display:block にする */
+/* 画像プレビュー */
 .image-preview {
-    display: none;
     margin-top: 8px;
+    display: flex;
     align-items: center;
     gap: 8px;
 }
@@ -553,7 +573,6 @@ input[type="file"]#messageImage {
     border: 1px solid #e6e6e6;
 }
 
-/* クリアボタン */
 .clear-image-btn {
     background: transparent;
     border: none;
@@ -562,19 +581,17 @@ input[type="file"]#messageImage {
     color: #666;
 }
 
-/* --- モーダル全体 --- */
+/* --- モーダル --- */
 .modal {
     position: fixed;
     inset: 0;
     display: none;
-    /* JS で display:flex にする */
     align-items: center;
     justify-content: center;
     z-index: 3000;
     background: rgba(0, 0, 0, 0.4);
 }
 
-/* modal-inner: 横パディングを変数で管理（content-box 使用） */
 .modal-inner {
     --modal-pad-x: 22px;
     width: 92%;
@@ -590,7 +607,6 @@ input[type="file"]#messageImage {
     overflow: visible;
 }
 
-/* フェードイン */
 @keyframes modalFadeIn {
     from {
         opacity: 0;
@@ -603,7 +619,6 @@ input[type="file"]#messageImage {
     }
 }
 
-/* modal-block（各セクション） */
 .modal-block {
     position: relative;
     width: 100%;
@@ -612,7 +627,6 @@ input[type="file"]#messageImage {
     z-index: 1;
 }
 
-/* divider — 実体の線（モーダル内を左右いっぱいに広げる） */
 .divider {
     position: relative;
     left: calc(-1 * var(--modal-pad-x, 22px));
@@ -624,12 +638,10 @@ input[type="file"]#messageImage {
     box-sizing: content-box;
 }
 
-/* 最後のブロックに divider があれば非表示 */
 .modal-block:last-child .divider {
     display: none;
 }
 
-/* 見出し / メッセージ */
 .modal-block h3 {
     margin: 0 0 4px 0;
     font-size: 34px;
@@ -642,7 +654,6 @@ input[type="file"]#messageImage {
     margin-bottom: 12px;
 }
 
-/* 星評価：塗りの★（未選択は灰の塗り、選択済みはゴールド） */
 .rating-stars-input {
     display: flex;
     justify-content: center;
@@ -650,7 +661,6 @@ input[type="file"]#messageImage {
     gap: 12px;
 }
 
-/* 星ボタン（未選択は灰で塗りつぶし） */
 .star-btn {
     background: transparent;
     border: 1px solid transparent;
@@ -659,28 +669,23 @@ input[type="file"]#messageImage {
     border-radius: 8px;
     cursor: pointer;
     color: #CFCFCF;
-    /* 未選択：灰（塗り） */
     transition: transform .12s ease, color .12s ease, text-shadow .12s ease;
     line-height: 1;
     user-select: none;
 }
 
-/* hover/focus 補助 */
 .star-btn:hover,
 .star-btn:focus {
     transform: scale(1.05);
     outline: none;
 }
 
-/* 選択済みは色だけゴールドに（未選択星は引き続き灰で塗りのまま） */
 .star-btn.filled {
     color: #FFF048;
-    /* ゴールド */
     text-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
     transform: scale(1.05);
 }
 
-/* モーダル内アクション（送信ボタン）を右寄せ */
 .modal-block.modal-actions {
     display: flex;
     justify-content: flex-end;
@@ -689,7 +694,6 @@ input[type="file"]#messageImage {
     padding-top: 6px;
 }
 
-/* 送信ボタン（見た目） */
 #submitRating.btn-complete {
     background-color: #FF5555;
     color: #fff;
@@ -702,7 +706,6 @@ input[type="file"]#messageImage {
     box-shadow: 0 6px 14px rgba(255, 85, 85, 0.12);
 }
 
-/* ホバー */
 #submitRating.btn-complete:hover,
 #submitRating.btn-complete:focus {
     transform: translateY(-1px);
@@ -711,7 +714,6 @@ input[type="file"]#messageImage {
     box-shadow: 0 10px 20px rgba(255, 85, 85, 0.18);
 }
 
-/* モバイル調整 */
 @media (max-width: 480px) {
     .modal-inner {
         --modal-pad-x: 16px;
@@ -727,28 +729,4 @@ input[type="file"]#messageImage {
         left: calc(-1 * var(--modal-pad-x));
         width: calc(100% + (var(--modal-pad-x) * 2));
     }
-}
-
-/* フォーム上部のエラーエリア */
-.form-errors {
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    color: #b71c1c;
-}
-
-/* 個別エラー */
-.form-error {
-    color: #b71c1c;
-    /* 赤文字 */
-    background: #fff1f0;
-    /* 薄い赤背景で目立たせる */
-    border: 1px solid #f5c6cb;
-    /* 薄い枠 */
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-weight: 700;
-    font-size: 14px;
-    line-height: 1.2;
 }
