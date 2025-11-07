@@ -140,21 +140,15 @@
             <form id="messageForm" action="{{ route('messages.store', ['conversation' => $conversation->id]) }}" method="POST" enctype="multipart/form-data" class="send-form" novalidate>
                 @csrf
 
-                {{-- Blade 側での個別フィールドエラー（保険として残す） --}}
-                @error('body')
-                    <p class="form-error-inline" data-field="body">{{ $message }}</p>
-                @enderror
-
-                @error('image')
-                    <p class="form-error-inline" data-field="image">{{ $message }}</p>
-                @enderror
+                {{-- ここでは Blade の @error を出さず、JS 側でサーバエラーを 1 行だけ出す設計にしています --}}
 
                 <div class="input-row">
                     <textarea name="body" id="messageBody" placeholder="取引メッセージを記入してください" maxlength="400" required>{{ old('body', '') }}</textarea>
 
                     <div class="controls">
                         <label for="messageImage" class="file-label" title="画像を追加">画像を追加</label>
-                        <input type="file" name="image" id="messageImage" style="display:none;" />
+                        {{-- accept 属性はヒント。最終判定は JS 側で行います（jpg/png を許可） --}}
+                        <input type="file" name="image" id="messageImage" accept="image/png,image/jpeg" style="display:none;" />
 
                         <button type="submit" class="btn-send" aria-label="送信">
                             <img src="{{ asset('storage/images/sent.jpg') }}" alt="送信">
@@ -215,6 +209,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const ratedUserInput = document.getElementById('rated_user_id');
     const submitBtn = document.getElementById('submitRating');
 
+    const form = document.getElementById('messageForm');
+    const textarea = document.getElementById('messageBody');
+
     if (wrapper) {
         wrapper.scrollTop = wrapper.scrollHeight;
     }
@@ -223,11 +220,16 @@ document.addEventListener('DOMContentLoaded', function () {
        サーバ側エラーを Blade から受け取る
        Object: { fieldName: [msg1, msg2, ...], ... }
        ------------------------- */
-    window.serverErrors = {!! json_encode($errors->messages(), JSON_UNESCAPED_UNICODE) !!} || {};
+    let serverErrors = {};
+    try {
+        serverErrors = {!! json_encode($errors->messages() ?? [], JSON_UNESCAPED_UNICODE) !!};
+    } catch (e) {
+        serverErrors = {};
+    }
 
     // helper: 表示用のエラー要素を作る（field に紐づく）
     function showFormError(field, message) {
-        // field に対応する既存要素があれば更新
+        // 同じ field の既存要素があれば更新（重複防止）
         let existing = document.querySelector('.form-error-inline[data-field="' + field + '"]');
         if (!existing) {
             existing = document.createElement('div');
@@ -235,14 +237,12 @@ document.addEventListener('DOMContentLoaded', function () {
             existing.setAttribute('data-field', field);
             existing.setAttribute('role', 'alert');
             // 挿入位置：フォーム内の .input-row の前（入力欄の上）
-            const form = document.getElementById('messageForm');
             const inputRow = form ? form.querySelector('.input-row') : null;
             if (form && inputRow) {
                 form.insertBefore(existing, inputRow);
             } else if (form) {
                 form.insertBefore(existing, form.firstChild);
             } else {
-                // 最終手段：body の先頭
                 document.body.insertBefore(existing, document.body.firstChild);
             }
         }
@@ -259,37 +259,81 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.form-error-inline').forEach(el => el.remove());
     }
 
-    // 初期ロード時にサーバエラーがあれば優先表示
+    // 初期ロード時にサーバエラーがあれば優先表示（1行だけ）
     (function applyServerErrors() {
         try {
-            // 優先順: body -> image -> first available
-            if (window.serverErrors && typeof window.serverErrors === 'object') {
-                if (Array.isArray(window.serverErrors.body) && window.serverErrors.body.length > 0) {
-                    showFormError('body', window.serverErrors.body[0]);
+            if (serverErrors && typeof serverErrors === 'object') {
+                if (Array.isArray(serverErrors.body) && serverErrors.body.length > 0) {
+                    showFormError('body', serverErrors.body[0]);
                     return;
                 }
-                if (Array.isArray(window.serverErrors.image) && window.serverErrors.image.length > 0) {
-                    showFormError('image', window.serverErrors.image[0]);
+                if (Array.isArray(serverErrors.image) && serverErrors.image.length > 0) {
+                    showFormError('image', serverErrors.image[0]);
                     return;
                 }
-                // その他があれば最初のフィールドの最初のメッセージを表示
-                for (const f in window.serverErrors) {
-                    if (Array.isArray(window.serverErrors[f]) && window.serverErrors[f].length > 0) {
-                        showFormError(f, window.serverErrors[f][0]);
+                for (const f in serverErrors) {
+                    if (Array.isArray(serverErrors[f]) && serverErrors[f].length > 0) {
+                        showFormError(f, serverErrors[f][0]);
                         return;
                     }
                 }
             }
         } catch (e) {
-            // ignore
             console.warn('applyServerErrors failed', e);
         }
     })();
 
     /* -------------------------
+       下書き（localStorage）: 会話ごとに保存・復元
+       ------------------------- */
+    const conversationId = '{{ $conversation->id ?? '' }}';
+    const draftKey = 'conversation_draft_' + conversationId;
+
+    function debounce(fn, wait) {
+        let t = null;
+        return function (...args) {
+            clearTimeout(t);
+            t = setTimeout(() => fn.apply(this, args), wait);
+        };
+    }
+
+    // restore only if textarea empty (so server old() isn't overwritten)
+    try {
+        if (textarea && (!textarea.value || textarea.value.trim() === '')) {
+            const saved = localStorage.getItem(draftKey);
+            if (saved && saved.trim() !== '') textarea.value = saved;
+        }
+    } catch (e) {
+        console.warn('draft restore failed', e);
+    }
+
+    if (textarea) {
+        const saveDraft = debounce(function () {
+            try {
+                const v = textarea.value || '';
+                if (v && v.trim() !== '') localStorage.setItem(draftKey, v);
+                else localStorage.removeItem(draftKey);
+            } catch (e) {
+                console.warn('draft save failed', e);
+            }
+        }, 300);
+
+        textarea.addEventListener('input', saveDraft);
+        textarea.addEventListener('blur', saveDraft);
+    }
+
+    // on normal form submit (page navigation), clear draft immediately
+    if (form) {
+        form.addEventListener('submit', function () {
+            try { localStorage.removeItem(draftKey); } catch (e) { /* ignore */ }
+            // clear client errors so server response determines new error display
+            clearFormError();
+        });
+    }
+
+    /* -------------------------
        画像 input の change ハンドラ（クライアント検証 + プレビュー）
-       - accept 属性を外しているため利用者は任意のファイルを選べます。
-       - JS で jpg/png（image/jpeg, image/png）以外は弾き、エラー表示します。
+       - accept 属性は補助。JS で jpg/png（image/jpeg, image/png）以外は弾き、エラー表示。
        ------------------------- */
     if (imageInput) {
         imageInput.addEventListener('change', function (e) {
@@ -303,13 +347,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            // クライアント側検証ルール（変更可）
             const allowed = ['image/png', 'image/jpeg'];
-            const maxBytes = 2 * 1024 * 1024; // 2MB 上限（必要に応じて調整）
+            const maxBytes = 2 * 1024 * 1024; // 2MB
 
-            // MIME タイプがない場合（古いブラウザや一部ファイル）は拡張子で判定（後方互換）
-            let fileType = file.type && file.type.toLowerCase();
-            if (!fileType && file.name) {
+            // MIME タイプがない場合（ブラウザ次第）や怪しい case は拡張子で補完
+            let fileType = (file.type || '').toLowerCase();
+            if ((!fileType || fileType === '') && file.name) {
                 const ext = file.name.split('.').pop().toLowerCase();
                 if (ext === 'jpg' || ext === 'jpeg') fileType = 'image/jpeg';
                 else if (ext === 'png') fileType = 'image/png';
@@ -329,12 +372,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            // プレビュー表示
+            // 成功 -> プレビュー表示、エラークリア
             const reader = new FileReader();
             reader.onload = function (ev) {
                 if (previewImg) previewImg.src = ev.target.result;
                 if (imagePreview) imagePreview.style.display = 'flex';
-                // 成功したら該当エラーを消す
                 clearFormError('image');
             };
             reader.readAsDataURL(file);
@@ -395,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     /* -------------------------
-       完了・評価送信（既存 fetch 呼び出しをそのまま使用）
+       完了・評価送信（既存 fetch 呼び出し）
        ------------------------- */
     if (openBtn) {
         openBtn.addEventListener('click', function () {
@@ -512,16 +554,16 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.link-edit').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.dataset.messageId;
-            const form = document.querySelector(`.edit-form[data-message-id="${id}"]`);
-            if (form) form.style.display = (form.style.display === 'none' || form.style.display === '') ? 'block' : 'none';
+            const formRow = document.querySelector(`.edit-form[data-message-id="${id}"]`);
+            if (formRow) formRow.style.display = (formRow.style.display === 'none' || formRow.style.display === '') ? 'block' : 'none';
         });
     });
 
     document.querySelectorAll('.btn-cancel-edit').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.dataset.messageId;
-            const form = document.querySelector(`.edit-form[data-message-id="${id}"]`);
-            if (form) form.style.display = 'none';
+            const formRow = document.querySelector(`.edit-form[data-message-id="${id}"]`);
+            if (formRow) formRow.style.display = 'none';
         });
     });
 
